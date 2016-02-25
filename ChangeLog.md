@@ -35,6 +35,7 @@
 - Show error message when debug info for some local variable is corrupted
 - [KT-11638](https://youtrack.jetbrains.com/issue/KT-11638) Fixed hashCode() implementation in "Generate equals/hashCode" action
 - [KT-11098](https://youtrack.jetbrains.com/issue/KT-11098) Inspection on final classes/functions annotated with Spring @Configuration/@Component/@Bean
+- [KT-11405](https://youtrack.jetbrains.com/issue/KT-11405) Navigation and Find Usages for Spring beans referenced in annotation arguments and BeanFactory method calls
 
 ### Tools.Gradle
 - Added project property 'kotlin.incremental'
