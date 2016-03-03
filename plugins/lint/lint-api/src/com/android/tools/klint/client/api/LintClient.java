@@ -14,16 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tools.lint.client.api;
-
-import static com.android.SdkConstants.CLASS_FOLDER;
-import static com.android.SdkConstants.DOT_AAR;
-import static com.android.SdkConstants.DOT_JAR;
-import static com.android.SdkConstants.GEN_FOLDER;
-import static com.android.SdkConstants.LIBS_FOLDER;
-import static com.android.SdkConstants.RES_FOLDER;
-import static com.android.SdkConstants.SRC_FOLDER;
-import static com.android.tools.lint.detector.api.LintUtils.endsWith;
+package com.android.tools.klint.client.api;
 
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
@@ -35,21 +26,21 @@ import com.android.prefs.AndroidLocation;
 import com.android.sdklib.IAndroidTarget;
 import com.android.sdklib.SdkVersionInfo;
 import com.android.sdklib.repository.local.LocalSdk;
-import com.android.tools.lint.detector.api.Context;
-import com.android.tools.lint.detector.api.Detector;
-import com.android.tools.lint.detector.api.Issue;
-import com.android.tools.lint.detector.api.LintUtils;
-import com.android.tools.lint.detector.api.Location;
-import com.android.tools.lint.detector.api.Project;
-import com.android.tools.lint.detector.api.Severity;
-import com.android.tools.lint.detector.api.TextFormat;
+import com.android.tools.klint.detector.api.Context;
+import com.android.tools.klint.detector.api.Detector;
+import com.android.tools.klint.detector.api.Issue;
+import com.android.tools.klint.detector.api.LintUtils;
+import com.android.tools.klint.detector.api.Location;
+import com.android.tools.klint.detector.api.Project;
+import com.android.tools.klint.detector.api.Severity;
+import com.android.tools.klint.detector.api.TextFormat;
 import com.android.utils.XmlUtils;
 import com.google.common.annotations.Beta;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.io.Files;
-
+import org.jetbrains.uast.UastConverter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -59,13 +50,10 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import static com.android.SdkConstants.*;
+import static com.android.tools.klint.detector.api.LintUtils.endsWith;
 
 /**
  * Information about the tool embedding the lint analyzer. IDEs and other tools
@@ -97,7 +85,7 @@ public abstract class LintClient {
      * Report the given issue. This method will only be called if the configuration
      * provided by {@link #getConfiguration(Project)} has reported the corresponding
      * issue as enabled and has not filtered out the issue with its
-     * {@link Configuration#ignore(Context,Issue,Location,String)} method.
+     * {@link Configuration#ignore(Context, Issue, Location,String)} method.
      * <p>
      * @param context the context used by the detector when the issue was found
      * @param issue the issue that was found
@@ -145,26 +133,13 @@ public abstract class LintClient {
             @Nullable Object... args);
 
     /**
-     * Returns a {@link XmlParser} to use to parse XML
+     * Returns a {@link com.android.tools.lint.client.api.XmlParser} to use to parse XML
      *
-     * @return a new {@link XmlParser}, or null if this client does not support
+     * @return a new {@link com.android.tools.lint.client.api.XmlParser}, or null if this client does not support
      *         XML analysis
      */
     @Nullable
     public abstract XmlParser getXmlParser();
-
-    /**
-     * Returns a {@link JavaParser} to use to parse Java
-     *
-     * @param project the project to parse, if known (this can be used to look up
-     *                the class path for type attribution etc, and it can also be used
-     *                to more efficiently process a set of files, for example to
-     *                perform type attribution for multiple units in a single pass)
-     * @return a new {@link JavaParser}, or null if this client does not
-     *         support Java analysis
-     */
-    @Nullable
-    public abstract JavaParser getJavaParser(@Nullable Project project);
 
     /**
      * Returns an optimal detector, if applicable. By default, just returns the
@@ -268,10 +243,10 @@ public abstract class LintClient {
     }
 
     /**
-     * Returns the {@link SdkInfo} to use for the given project.
+     * Returns the {@link com.android.tools.lint.client.api.SdkInfo} to use for the given project.
      *
-     * @param project the project to look up an {@link SdkInfo} for
-     * @return an {@link SdkInfo} for the project
+     * @param project the project to look up an {@link com.android.tools.lint.client.api.SdkInfo} for
+     * @return an {@link com.android.tools.lint.client.api.SdkInfo} for the project
      */
     @NonNull
     public SdkInfo getSdkInfo(@NonNull Project project) {
@@ -406,6 +381,15 @@ public abstract class LintClient {
         return false;
     }
 
+    @Nullable
+    public com.intellij.openapi.project.Project getProject() {
+        return null;
+    }
+
+    public List<UastConverter> getConverters() {
+        return Collections.emptyList();
+    }
+
     /**
      * Information about class paths (sources, class files and libraries)
      * usually associated with a project.
@@ -514,7 +498,7 @@ public abstract class LintClient {
                 if (jars != null) {
                     for (File jar : jars) {
                         if (LintUtils.endsWith(jar.getPath(), DOT_JAR)
-                                && !libraries.contains(jar)) {
+                            && !libraries.contains(jar)) {
                             libraries.add(jar);
                         }
                     }
@@ -825,11 +809,13 @@ public abstract class LintClient {
     public Map<String, String> createSuperClassMap(@NonNull Project project) {
         List<File> libraries = project.getJavaLibraries();
         List<File> classFolders = project.getJavaClassFolders();
-        List<ClassEntry> classEntries = ClassEntry.fromClassPath(this, classFolders, true);
+        List<ClassEntry> classEntries = ClassEntry
+                .fromClassPath(this, classFolders, true);
         if (libraries.isEmpty()) {
             return ClassEntry.createSuperClassMap(this, classEntries);
         }
-        List<ClassEntry> libraryEntries = ClassEntry.fromClassPath(this, libraries, true);
+        List<ClassEntry> libraryEntries = ClassEntry
+                .fromClassPath(this, libraries, true);
         return ClassEntry.createSuperClassMap(this, libraryEntries, classEntries);
     }
 
@@ -937,7 +923,7 @@ public abstract class LintClient {
      * settings.
      *
      * @param url the URL to read
-     * @return a {@link java.net.URLConnection} or null
+     * @return a {@link URLConnection} or null
      * @throws IOException if any kind of IO exception occurs
      */
     @Nullable
@@ -945,7 +931,7 @@ public abstract class LintClient {
         return url.openConnection();
     }
 
-    /** Closes a connection previously returned by {@link #openConnection(java.net.URL)} */
+    /** Closes a connection previously returned by {@link #openConnection(URL)} */
     public void closeConnection(@NonNull URLConnection connection) throws IOException {
         if (connection instanceof HttpURLConnection) {
             ((HttpURLConnection)connection).disconnect();
@@ -962,7 +948,8 @@ public abstract class LintClient {
      */
     @SuppressWarnings("MethodMayBeStatic") // Intentionally instance method so it can be overridden
     public boolean isProjectDirectory(@NonNull File dir) {
-        return LintUtils.isManifestFolder(dir) || Project.isAospFrameworksProject(dir);
+        return LintUtils.isManifestFolder(dir) || Project
+                .isAospFrameworksProject(dir);
     }
 
     /**
@@ -1019,7 +1006,8 @@ public abstract class LintClient {
      * @return the project resources, or null if not available
      */
     @Nullable
-    public AbstractResourceRepository getProjectResources(Project project,
+    public AbstractResourceRepository getProjectResources(
+            Project project,
             boolean includeDependencies) {
         return null;
     }

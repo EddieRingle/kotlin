@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tools.lint.detector.api;
+package com.android.tools.klint.detector.api;
 
 import com.android.annotations.NonNull;
 import com.android.resources.ResourceFolderType;
@@ -31,7 +31,8 @@ import java.io.File;
  * to adjust your code for the next tools release.</b>
  */
 @Beta
-public abstract class ResourceXmlDetector extends Detector implements Detector.XmlScanner {
+public abstract class ResourceXmlDetector extends Detector
+        implements Detector.XmlScanner {
     @Override
     public boolean appliesTo(@NonNull Context context, @NonNull File file) {
         return LintUtils.isXmlFile(file);

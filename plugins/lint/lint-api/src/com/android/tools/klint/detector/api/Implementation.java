@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.tools.lint.detector.api;
+package com.android.tools.klint.detector.api;
 
 import com.android.annotations.NonNull;
 import com.google.common.annotations.Beta;
@@ -164,7 +164,7 @@ public class Implementation {
      * <p>
      * An issue can register additional scope sets that can are adequate
      * for analyzing the issue, by supplying it to
-     * {@link #Implementation(Class, java.util.EnumSet, java.util.EnumSet[])}.
+     * {@link #Implementation(Class, EnumSet, EnumSet[])}.
      * This method returns true if the given scope matches one or more analysis
      * scope, or the overall scope.
      *

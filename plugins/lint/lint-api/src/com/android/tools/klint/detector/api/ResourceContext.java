@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package com.android.tools.lint.detector.api;
+package com.android.tools.klint.detector.api;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.resources.ResourceFolderType;
-import com.android.tools.lint.client.api.LintDriver;
+import com.android.tools.klint.client.api.LintDriver;
 import com.google.common.annotations.Beta;
 
 import java.io.File;
 
 /**
- * A {@link com.android.tools.lint.detector.api.Context} used when checking resource files
+ * A {@link Context} used when checking resource files
  * (both bitmaps and XML files; for XML files a subclass of this context is used:
- * {@link com.android.tools.lint.detector.api.XmlContext}.)
+ * {@link XmlContext}.)
  * <p/>
  * <b>NOTE: This is not a public or final API; if you rely on this be prepared
  * to adjust your code for the next tools release.</b>
@@ -37,7 +37,7 @@ public class ResourceContext extends Context {
     private final ResourceFolderType mFolderType;
 
     /**
-     * Construct a new {@link com.android.tools.lint.detector.api.ResourceContext}
+     * Construct a new {@link ResourceContext}
      *
      * @param driver the driver running through the checks
      * @param project the project containing the file being checked
@@ -46,7 +46,7 @@ public class ResourceContext extends Context {
      *            the root project of all library projects, not necessarily the
      *            directly including project.
      * @param file the file being checked
-     * @param folderType the {@link com.android.resources.ResourceFolderType} of this file, if any
+     * @param folderType the {@link ResourceFolderType} of this file, if any
      */
     public ResourceContext(
             @NonNull LintDriver driver,

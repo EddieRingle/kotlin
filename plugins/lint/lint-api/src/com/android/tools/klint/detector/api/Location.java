@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tools.lint.detector.api;
+package com.android.tools.klint.detector.api;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
@@ -204,11 +204,11 @@ public class Location {
             return new Location(file, null /*start*/, null /*end*/);
         }
         return new Location(file,
-                new DefaultPosition(
+                            new DefaultPosition(
                         position.getStartLine(),
                         position.getStartColumn(),
                         position.getStartOffset()),
-                new DefaultPosition(
+                            new DefaultPosition(
                         position.getEndLine(),
                         position.getEndColumn(),
                         position.getEndOffset()));
@@ -253,8 +253,8 @@ public class Location {
 
         if (contents == null) {
             return new Location(file,
-                    new DefaultPosition(-1, -1, startOffset),
-                    new DefaultPosition(-1, -1, endOffset));
+                                new DefaultPosition(-1, -1, startOffset),
+                                new DefaultPosition(-1, -1, endOffset));
         }
 
         int size = contents.length();
@@ -387,18 +387,18 @@ public class Location {
                         int end = contents.indexOf(patternEnd, offset + patternStart.length());
                         if (end != -1) {
                             return new Location(file, new DefaultPosition(line, column, index),
-                                    new DefaultPosition(line, -1, end + patternEnd.length()));
+                                                new DefaultPosition(line, -1, end + patternEnd.length()));
                         }
                     } else if (hints != null && (hints.isJavaSymbol() || hints.isWholeWord())) {
                         if (hints.isConstructor() && contents.startsWith(SUPER_KEYWORD, index)) {
                             patternStart = SUPER_KEYWORD;
                         }
                         return new Location(file, new DefaultPosition(line, column, index),
-                                new DefaultPosition(line, column + patternStart.length(),
+                                            new DefaultPosition(line, column + patternStart.length(),
                                         index + patternStart.length()));
                     }
                     return new Location(file, new DefaultPosition(line, column, index),
-                            new DefaultPosition(line, column, index + patternStart.length()));
+                                        new DefaultPosition(line, column, index + patternStart.length()));
                 }
             }
 

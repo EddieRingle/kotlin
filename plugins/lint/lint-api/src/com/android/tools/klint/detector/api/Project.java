@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.tools.lint.detector.api;
+package com.android.tools.klint.detector.api;
 
 import com.android.SdkConstants;
 import com.android.annotations.NonNull;
@@ -28,10 +28,10 @@ import com.android.resources.ResourceFolderType;
 import com.android.sdklib.AndroidVersion;
 import com.android.sdklib.IAndroidTarget;
 import com.android.sdklib.SdkVersionInfo;
-import com.android.tools.lint.client.api.CircularDependencyException;
-import com.android.tools.lint.client.api.Configuration;
-import com.android.tools.lint.client.api.LintClient;
-import com.android.tools.lint.client.api.SdkInfo;
+import com.android.tools.klint.client.api.CircularDependencyException;
+import com.android.tools.klint.client.api.Configuration;
+import com.android.tools.klint.client.api.LintClient;
+import com.android.tools.klint.client.api.SdkInfo;
 import com.google.common.annotations.Beta;
 import com.google.common.base.CharMatcher;
 import com.google.common.base.Charsets;
@@ -223,7 +223,7 @@ public class Project {
                                 mBuildSdk = Integer.parseInt(versionString);
                             } catch (NumberFormatException nufe) {
                                 mClient.log(Severity.WARNING, null,
-                                        "Unexpected build target format: %1$s", target);
+                                            "Unexpected build target format: %1$s", target);
                             }
                         }
                     }
@@ -263,7 +263,7 @@ public class Project {
 
                         try {
                             Project libraryPrj = mClient.getProject(libraryDir,
-                                    libraryReferenceDir);
+                                                                    libraryReferenceDir);
                             mDirectLibraries.add(libraryPrj);
                             // By default, we don't report issues in inferred library projects.
                             // The driver will set report = true for those library explicitly
@@ -737,7 +737,7 @@ public class Project {
             if (seen.contains(library)) {
                 if (path.contains(library)) {
                     mClient.log(Severity.WARNING, null,
-                            "Internal lint error: cyclic library dependency for %1$s", library);
+                                "Internal lint error: cyclic library dependency for %1$s", library);
                 }
                 continue;
             }

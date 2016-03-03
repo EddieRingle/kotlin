@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package com.android.tools.lint.detector.api;
-
-import static com.android.tools.lint.detector.api.TextFormat.RAW;
+package com.android.tools.klint.detector.api;
 
 import com.android.annotations.NonNull;
-import com.android.tools.lint.client.api.Configuration;
 import com.google.common.annotations.Beta;
 
 import java.util.ArrayList;
@@ -100,7 +97,7 @@ public final class Issue implements Comparable<Issue> {
             @NonNull Severity severity,
             @NonNull Implementation implementation) {
         return new Issue(id, briefDescription, explanation, category, priority,
-                severity, implementation);
+                         severity, implementation);
     }
 
     /**
@@ -120,7 +117,7 @@ public final class Issue implements Comparable<Issue> {
             @NonNull Severity severity,
             @NonNull Implementation implementation) {
         return new Issue(id, briefDescription, explanation, category, priority,
-                severity, implementation);
+                         severity, implementation);
     }
 
     /**
@@ -142,7 +139,7 @@ public final class Issue implements Comparable<Issue> {
      */
     @NonNull
     public String getBriefDescription(@NonNull TextFormat format) {
-        return RAW.convertTo(mBriefDescription, format);
+        return TextFormat.RAW.convertTo(mBriefDescription, format);
     }
 
     /**
@@ -156,7 +153,7 @@ public final class Issue implements Comparable<Issue> {
      */
     @NonNull
     public String getExplanation(@NonNull TextFormat format) {
-        return RAW.convertTo(mExplanation, format);
+        return TextFormat.RAW.convertTo(mExplanation, format);
     }
 
     /**
@@ -184,7 +181,7 @@ public final class Issue implements Comparable<Issue> {
      * tools may allow the user to specify custom severities for detectors).
      * <p>
      * Note that even though the normal way for an issue to be disabled is for
-     * the {@link Configuration} to return {@link Severity#IGNORE}, there is a
+     * the {@link com.android.tools.klint.client.api.Configuration} to return {@link Severity#IGNORE}, there is a
      * {@link #isEnabledByDefault()} method which can be used to turn off issues
      * by default. This is done rather than just having the severity as the only
      * attribute on the issue such that an issue can be configured with an

@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package com.android.tools.lint.client.api;
+package com.android.tools.klint.client.api;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
-import com.android.tools.lint.detector.api.Context;
+import com.android.tools.klint.detector.api.Context;
 import com.google.common.annotations.Beta;
 
 /**
@@ -65,6 +65,8 @@ public interface LintListener {
      * @param type the type of event that occurred
      * @param context the context providing additional information
      */
-    void update(@NonNull LintDriver driver, @NonNull EventType type,
-            @Nullable Context context);
+    void update(
+            @NonNull LintDriver driver, @NonNull EventType type,
+            @Nullable Context context
+    );
 }

@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.android.tools.lint.client.api;
+package com.android.tools.klint.client.api;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
-import com.android.tools.lint.detector.api.Context;
-import com.android.tools.lint.detector.api.Location;
-import com.android.tools.lint.detector.api.XmlContext;
+import com.android.tools.klint.detector.api.Context;
+import com.android.tools.klint.detector.api.Location;
+import com.android.tools.klint.detector.api.XmlContext;
 import com.google.common.annotations.Beta;
-
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -96,7 +95,7 @@ public abstract class XmlParser {
     /**
      * Creates a light-weight handle to a location for the given node. It can be
      * turned into a full fledged location by
-     * {@link com.android.tools.lint.detector.api.Location.Handle#resolve()}.
+     * {@link Location.Handle#resolve()}.
      *
      * @param context the context providing the node
      * @param node the node (element or attribute) to create a location handle

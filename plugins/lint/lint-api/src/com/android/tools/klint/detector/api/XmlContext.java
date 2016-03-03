@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package com.android.tools.lint.detector.api;
+package com.android.tools.klint.detector.api;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
 import com.android.resources.ResourceFolderType;
-import com.android.tools.lint.client.api.LintDriver;
-import com.android.tools.lint.client.api.XmlParser;
+import com.android.tools.klint.client.api.LintDriver;
+import com.android.tools.klint.client.api.XmlParser;
 import com.google.common.annotations.Beta;
-
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -143,10 +142,10 @@ public class XmlContext extends ResourceContext {
 
     /**
      * Report an error.
-     * Like {@link #report(Issue, org.w3c.dom.Node, Location, String)} but with
+     * Like {@link #report(Issue, Node, Location, String)} but with
      * a now-unused data parameter at the end.
      *
-     * @deprecated Use {@link #report(Issue, org.w3c.dom.Node, Location, String)} instead;
+     * @deprecated Use {@link #report(Issue, Node, Location, String)} instead;
      *    this method is here for custom rule compatibility
      */
     @SuppressWarnings("UnusedDeclaration") // Potentially used by external existing custom rules

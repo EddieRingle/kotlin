@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.android.tools.lint.client.api;
+package com.android.tools.klint.client.api;
 
 import com.android.annotations.NonNull;
 import com.android.annotations.Nullable;
-import com.android.tools.lint.detector.api.Project;
-import com.android.tools.lint.detector.api.Scope;
+import com.android.tools.klint.detector.api.Project;
+import com.android.tools.klint.detector.api.Scope;
 import com.google.common.annotations.Beta;
 
 import java.io.File;
@@ -138,7 +138,7 @@ public class LintRequest {
     /**
      * Gets the projects for the lint requests. This is optional; if not provided lint will search
      * the {@link #getFiles()} directories and look for projects via {@link
-     * LintClient#isProjectDirectory(java.io.File)}. However, this method allows a lint client to
+     * LintClient#isProjectDirectory(File)}. However, this method allows a lint client to
      * set up all the projects ahead of time, and associate those projects with native resources
      * (in an IDE for example, each lint project can be associated with the corresponding IDE
      * project).
@@ -153,7 +153,7 @@ public class LintRequest {
     /**
      * Sets the projects for the lint requests. This is optional; if not provided lint will search
      * the {@link #getFiles()} directories and look for projects via {@link
-     * LintClient#isProjectDirectory(java.io.File)}. However, this method allows a lint client to
+     * LintClient#isProjectDirectory(File)}. However, this method allows a lint client to
      * set up all the projects ahead of time, and associate those projects with native resources
      * (in an IDE for example, each lint project can be associated with the corresponding IDE
      * project).

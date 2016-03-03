@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.tools.lint.client.api;
+package com.android.tools.klint.client.api;
 
 import com.android.annotations.NonNull;
-import com.android.tools.lint.detector.api.Issue;
-import com.android.tools.lint.detector.api.Severity;
+import com.android.tools.klint.detector.api.Issue;
+import com.android.tools.klint.detector.api.Severity;
 import com.android.utils.SdkUtils;
 import com.google.common.collect.Lists;
 
@@ -54,7 +54,7 @@ class JarFileIssueRegistry extends IssueRegistry {
 
     @NonNull
     static IssueRegistry get(@NonNull LintClient client, @NonNull File jarFile) throws IOException,
-            ClassNotFoundException, IllegalAccessException, InstantiationException {
+                                                                                       ClassNotFoundException, IllegalAccessException, InstantiationException {
         if (sCache == null) {
            sCache = new HashMap<File, SoftReference<JarFileIssueRegistry>>();
         } else {
