@@ -1476,7 +1476,6 @@ public class LintDriver {
             if (ideaProject == null) {
                 return;
             }
-            List<UastLanguagePlugin> plugins = mClient.getLanguagePlugins();
 
             for (JavaContext context : contexts) {
                 fireEvent(LintListener.EventType.SCANNING_FILE, context);
@@ -1487,10 +1486,10 @@ public class LintDriver {
                         UastVisitor customVisitor = scanner.createUastVisitor(context);
                         if (customVisitor != null) {
                             UastChecker.INSTANCE.checkWithCustomHandler(
-                                    ideaProject, context.file, plugins, customVisitor);
+                                    ideaProject, context.file, context, customVisitor);
                         } else {
                             UastChecker.INSTANCE.check(
-                                    ideaProject, context.file, (UastScanner)check, plugins, context);
+                                    ideaProject, context.file, (UastScanner)check, context);
                         }
                     }
                 }
@@ -1547,9 +1546,9 @@ public class LintDriver {
             for (UastScanner detector : detectors) {
                 UastVisitor customHandler = detector.createUastVisitor(context);
                 if (customHandler != null) {
-                    checker.checkWithCustomHandler(intellijProject, file, plugins, customHandler);
+                    checker.checkWithCustomHandler(intellijProject, file, context, customHandler);
                 } else {
-                    checker.check(intellijProject, file, detector, plugins, context);
+                    checker.check(intellijProject, file, detector, context);
                 }
             }
         }
