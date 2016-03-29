@@ -1535,8 +1535,8 @@ public class LintDriver {
                 continue;
             }
 
-            String path = file.getPath();
-            if (!path.endsWith(DOT_JAVA) && !UastConverterUtils.isFileSupported(plugins, path)) {
+            String filename = file.getName();
+            if (!filename.endsWith(DOT_JAVA) && !UastConverterUtils.isFileSupported(plugins, filename)) {
                 continue;
             }
 
@@ -1552,14 +1552,6 @@ public class LintDriver {
                 }
             }
         }
-    }
-
-    private boolean isAcceptableSourceFilename(String path) {
-        if (path.endsWith(DOT_JAVA)) {
-            return true;
-        }
-
-        return UastConverterUtils.isFileSupported(mClient.getLanguagePlugins(), path);
     }
 
     private static void gatherJavaFiles(@NonNull File dir, @NonNull List<File> result) {
