@@ -40,6 +40,7 @@ import com.intellij.ui.EditorNotificationPanel
 import com.intellij.ui.EditorNotifications
 import org.jetbrains.kotlin.idea.KotlinFileType
 import org.jetbrains.kotlin.idea.KotlinLanguage
+import org.jetbrains.kotlin.idea.project.ProjectStructureUtil
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.idea.versions.UnsupportedAbiVersionNotificationPanelProvider
 import org.jetbrains.kotlin.idea.versions.createComponentActionLabel
@@ -79,6 +80,7 @@ class KotlinSetupEnvironmentNotificationProvider(
         }
 
         if (!hasKotlinRuntimeInScope(module) &&
+            !ProjectStructureUtil.isJsKotlinModule(module) &&
             UnsupportedAbiVersionNotificationPanelProvider.collectBadRoots(module).isEmpty()) {
             return createKotlinNotConfiguredPanel(module)
         }
