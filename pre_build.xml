@@ -1,0 +1,61 @@
+<project name="Dynamic Build Configuration" default="configure" xmlns:if="ant:if" xmlns:unless="ant:unless">
+    <!-- Adjust settings for specified branches -->
+    <!-- Make old builds work after configuration modifications -->
+
+    <!-- Migration 1. Move to Idea 2016 dependency. It depends on Java 1.8. -->
+    <property name="migration1.old.branch.pattern" value="(rr/)?(rc)|(1\.0\.0)|(1\.0\.1)|(1\.0\.2)(.*)?"/>
+    <property name="migration1.new.branch.pattern" value="rr/jdk8"/>
+
+    <property name="migration1.new.idea.build.16.artifacts" value=""/>
+    <property name="migration1.new.idea.build.16.run.configurations" value="Compiler Tests"/>
+    <property name="migration1.new.idea.build.18.artifacts" value="KotlinPlugin|nKotlinBarePlugin|nIdeLazyResolver|nKotlinAndroidExtensions"/>
+    <property name="migration1.new.idea.build.18.run.configurations" value="Js-backend tests|nAll IDEA Plugin Tests"/>
+    <property name="migration1.new.compiler.step.ant.targets" value="dist,zip-compiler,kotlin-for-upsource,zip-test-data"/>
+
+    <property name="migration1.old.idea.build.16.artifacts" value="KotlinPlugin|nKotlinBarePlugin|nIdeLazyResolver|nKotlinAndroidExtensions"/>
+    <property name="migration1.old.idea.build.16.run.configurations" value="All Tests"/>
+    <property name="migration1.old.idea.build.18.artifacts" value=""/>
+    <property name="migration1.old.idea.build.18.run.configurations" value=""/>
+    <property name="migration1.old.compiler.step.ant.targets" value="build-artifacts"/>
+
+    <target name="migration1.java16.to.java18">
+        <echo message="${teamcity.build.branch}"/>
+        <condition property="is.old.branch">
+            <matches pattern="${migration1.old.branch.pattern}" string="${teamcity.build.branch}"/>
+        </condition>
+
+        <sequential if:true="${is.old.branch}">
+            <echo message="migration1: old branch detected"/>
+            <!--<set key="idea.build.16.artifacts" value="${migration1.old.idea.build.16.artifacts}"/>-->
+            <!--<set key="idea.build.16.run.configurations" value="${migration1.old.idea.build.16.run.configurations}"/>-->
+            <!--<set key="idea.build.18.artifacts" value="${migration1.old.idea.build.18.artifacts}"/>-->
+            <!--<set key="idea.build.18.run.configurations" value="${migration1.old.idea.build.18.run.configurations}"/>-->
+        </sequential>
+
+        <condition property="is.new.branch">
+            <matches pattern="${migration1.new.branch.pattern}" string="${teamcity.build.branch}"/>
+        </condition>
+
+        <sequential if:true="${is.new.branch}">
+            <echo message="migration1: new branch detected"/>
+            <set key="idea.build.16.artifacts" value="${migration1.new.idea.build.16.artifacts}"/>
+            <set key="idea.build.16.run.configurations" value="${migration1.new.idea.build.16.run.configurations}"/>
+            <set key="idea.build.18.artifacts" value="${migration1.new.idea.build.18.artifacts}"/>
+            <set key="idea.build.18.run.configurations" value="${migration1.new.idea.build.18.run.configurations}"/>
+            <set key="compiler.step.ant.targets" value="${migration1.new.compiler.step.ant.targets}"/>
+        </sequential>
+    </target>
+
+    <!-- Properties for local TeamCity emulation -->
+    <!--<property name="teamcity.build.branch" value="rc"/>-->
+
+    <macrodef name="set">
+        <attribute name="key"/>
+        <attribute name="value"/>
+        <sequential>
+            <echo message="##teamcity[setParameter key='@{key}' value='@{value}']"/>
+        </sequential>
+    </macrodef>
+
+    <target name="configure" depends="migration1.java16.to.java18"/>
+</project>
