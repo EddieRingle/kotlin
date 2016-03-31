@@ -99,7 +99,7 @@ public class HandlerDetector extends Detector implements UastScanner {
         }
 
         UElement locationNode = node.getNameElement();
-        Location location = UastAndroidUtils.getLocation(locationNode);
+        Location location = context.getLocation(locationNode);
         context.report(ISSUE, node, location, String.format(
           "This Handler class should be static or leaks might occur (%1$s)",
           node.getName()));

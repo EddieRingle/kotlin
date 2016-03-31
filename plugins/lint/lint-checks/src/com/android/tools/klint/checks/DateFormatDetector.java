@@ -93,7 +93,7 @@ public class DateFormatDetector extends Detector implements UastScanner {
     @Override
     public void visitConstructor(UastAndroidContext context, UCallExpression functionCall, UFunction constructor) {
         if (!specifiesLocale(constructor)) {
-            Location location = UastAndroidUtils.getLocation(functionCall);
+            Location location = context.getLocation(functionCall);
             String message =
               "To get local formatting use `getDateInstance()`, `getDateTimeInstance()`, " +
               "or `getTimeInstance()`, or use `new SimpleDateFormat(String template, " +

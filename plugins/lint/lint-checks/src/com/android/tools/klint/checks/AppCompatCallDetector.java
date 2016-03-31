@@ -113,7 +113,7 @@ public class AppCompatCallDetector extends Detector implements UastScanner {
 
             if (replace != null) {
                 String message = String.format(ERROR_MESSAGE_FORMAT, replace, node.getFunctionName());
-                context.report(ISSUE, node, UastAndroidUtils.getLocation(node), message);
+                context.report(ISSUE, node, context.getLocation(node), message);
             }
         }
     }

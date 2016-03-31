@@ -129,8 +129,8 @@ public class CutPasteDetector extends Detector implements UastScanner {
                         if (!isReachableFrom(method, earlierCall, node)) {
                             return;
                         }
-                        Location location = UastAndroidUtils.getLocation(node);
-                        Location secondary = UastAndroidUtils.getLocation(earlierCall);
+                        Location location = context.getLocation(node);
+                        Location secondary = context.getLocation(earlierCall);
                         if (location != null && secondary != null) {
                             secondary.setMessage("First usage here");
                             location.setSecondary(secondary);

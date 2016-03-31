@@ -149,7 +149,7 @@ public class SharedPrefsDetector extends Detector implements UastScanner {
         CommitFinder finder = new CommitFinder(context, node, allowCommitBeforeTarget);
         method.accept(finder);
         if (!finder.isCommitCalled()) {
-            context.report(ISSUE, method, UastAndroidUtils.getLocation(node),
+            context.report(ISSUE, method, context.getLocation(node),
                            "`SharedPreferences.edit()` without a corresponding `commit()` or `apply()` call");
         }
     }
@@ -220,8 +220,7 @@ public class SharedPrefsDetector extends Detector implements UastScanner {
                                 returnValueIgnored = true;
                             } else if (qualifiedElement instanceof UIfExpression) {
                                 returnValueIgnored = ((UIfExpression) qualifiedElement).getCondition() != node;
-                            } else if (qualifiedElement instanceof USpecialExpressionList &&
-                                       ((USpecialExpressionList)qualifiedElement).getKind() == UastSpecialExpressionKind.RETURN) {
+                            } else if (qualifiedElement instanceof UReturnExpression) {
                                 returnValueIgnored = false;
                             } else if (qualifiedElement instanceof UVariable) {
                                 returnValueIgnored = false;
@@ -243,7 +242,7 @@ public class SharedPrefsDetector extends Detector implements UastScanner {
                                 String message = "Consider using `apply()` instead; `commit` writes "
                                                  + "its data to persistent storage immediately, whereas "
                                                  + "`apply` will handle it in the background";
-                                mContext.report(ISSUE, node, UastAndroidUtils.getLocation(node), message);
+                                mContext.report(ISSUE, node, mContext.getLocation(node), message);
                             }
                         }
                     }
@@ -254,11 +253,9 @@ public class SharedPrefsDetector extends Detector implements UastScanner {
         }
 
         @Override
-        public boolean visitSpecialExpressionList(@NotNull USpecialExpressionList node) {
-            if (node.getKind() == UastSpecialExpressionKind.RETURN) {
-                if (node.getExpressions().contains(mTarget)) {
-                    mFound = true;
-                }
+        public boolean visitReturnExpression(@NotNull UReturnExpression node) {
+            if (mTarget.equals(node.getExpressionType())) {
+                mFound = true;
             }
 
             return false;

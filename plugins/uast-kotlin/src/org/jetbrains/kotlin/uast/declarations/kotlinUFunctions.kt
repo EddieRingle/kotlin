@@ -43,10 +43,11 @@ abstract class KotlinAbstractUFunction : KotlinAbstractUElement(), UFunction, Ps
     override val valueParameters by lz { psi.valueParameters.map { KotlinConverter.convert(it, this) } }
 
     override fun getSuperFunctions(context: UastContext): List<UFunction> {
+        if (this.isTopLevel()) return emptyList()
         val bindingContext = psi.analyze(BodyResolveMode.PARTIAL)
         val clazz = bindingContext[BindingContext.DECLARATION_TO_DESCRIPTOR, psi] as? FunctionDescriptor ?: return emptyList()
         return clazz.overriddenDescriptors.map {
-            context.convert(it.toSource(psi)) as? UFunction
+            context.convert(it.toSource()) as? UFunction
         }.filterNotNull()
     }
 
@@ -207,7 +208,7 @@ open class KotlinObjectLiteralConstructorUFunction(
                     get() = KotlinConverter.convert(param.type, psi.project, this)
                 override val nameElement: UElement?
                     get() = null
-                override val parent: UElement?
+                override val parent: UElement
                     get() = this@KotlinObjectLiteralConstructorUFunction
                 override val name: String
                     get() = param.name.asString()

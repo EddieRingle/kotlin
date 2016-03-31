@@ -78,7 +78,7 @@ class PropertyAsCallAndroidUastAdditionalChecker : AndroidUastAdditionalChecker 
             override val kind = UastCallKind.FUNCTION_CALL
 
             override fun resolve(context: UastContext): UFunction? {
-                val source = accessorDescriptor.toSource(psi.project)
+                val source = accessorDescriptor.toSource()
                 if (source != null) {
                     (context.convert(source) as? UFunction)?.let { return it }
                 }

@@ -33,9 +33,9 @@ interface UTryExpression : UExpression {
 
     override fun renderString() = buildString {
         append("try ")
-        appendln(tryClause.renderString())
-        catchClauses.forEach { appendln(it.renderString()) }
-        finallyClause?.let { append("finally ").append(it.renderString()) }
+        appendln(tryClause.renderString().trim('\n'))
+        catchClauses.forEach { appendln(it.renderString().trim('\n')) }
+        finallyClause?.let { append("finally ").append(it.renderString().trim('\n')) }
     }
 
     override fun logString() = "UTryExpression\n" +

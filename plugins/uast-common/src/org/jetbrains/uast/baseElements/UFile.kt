@@ -37,7 +37,7 @@ interface UFile: UElement {
     override fun logString() = "UFile (package = $packageFqName)\n" + declarations.joinToString("\n") { it.logString().withMargin }
 
     override fun renderString() = buildString {
-        if (packageFqName != null) {
+        if (!packageFqName.isNullOrBlank()) {
             appendln("package $packageFqName")
             appendln()
         }

@@ -47,13 +47,8 @@ class KotlinUClass(
         get() = psi.name.orAnonymous()
 
     override val nameElement by lz {
-        fun objectKeyword() = try { // !! in getObjectKeyword()
-            if (psi is KtObjectDeclaration && psi.isObjectLiteral()) psi.getObjectKeyword() else null
-        } catch (e: NullPointerException) {
-            null
-        }
-
-        val namePsiElement = psi.nameIdentifier ?: objectKeyword()
+        val namePsiElement = psi.nameIdentifier
+                             ?: if (psi is KtObjectDeclaration && psi.isObjectLiteral()) psi.getObjectKeyword() else null
         KotlinConverter.asSimpleReference(namePsiElement, this)
     }
 
@@ -63,12 +58,7 @@ class KotlinUClass(
     override val kind by lz {
         when {
             psi.isAnnotation() -> UastClassKind.ANNOTATION
-            (psi as? KtObjectDeclaration)?.isCompanion() ?: false -> {
-                if (psi.name == SpecialNames.DEFAULT_NAME_FOR_COMPANION_OBJECT.toString())
-                    KotlinClassKinds.DEFAULT_COMPANION_OBJECT
-                else
-                    KotlinClassKinds.NAMED_COMPANION_OBJECT
-            }
+            (psi as? KtObjectDeclaration)?.isCompanion() ?: false -> KotlinClassKinds.COMPANION_OBJECT
             psi is KtObjectDeclaration -> UastClassKind.OBJECT
             (psi as? KtClass)?.isInterface() ?: false -> UastClassKind.INTERFACE
             (psi as? KtClass)?.isEnum() ?: false -> UastClassKind.ENUM
@@ -95,7 +85,7 @@ class KotlinUClass(
     override fun getSuperClass(context: UastContext): UClass? {
         val descriptor = resolveToDescriptor() ?: return null
         if (KotlinBuiltIns.isAny(descriptor)) return null
-        val source = descriptor.getSuperClassOrAny().toSource(psi.project) ?: return null
+        val source = descriptor.getSuperClassOrAny().toSource() ?: return null
         return context.convert(source) as? UClass
     }
 
@@ -103,10 +93,7 @@ class KotlinUClass(
 
     override val declarations by lz {
         val primaryConstructor = if (psi is KtObjectDeclaration && psi.isObjectLiteral()) {
-            val obj = psi
-            object : KotlinObjectLiteralConstructorUFunction(obj, this) {
-
-            }
+            KotlinObjectLiteralConstructorUFunction(psi, this)
         } else {
             psi.getPrimaryConstructor()?.let { KotlinConverter.convert(it, this) } ?: run {
                 if (psi.getSecondaryConstructors().isEmpty())

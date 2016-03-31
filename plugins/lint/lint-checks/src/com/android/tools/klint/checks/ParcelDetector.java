@@ -100,7 +100,7 @@ public class ParcelDetector extends Detector implements UastScanner {
                                 return true;
                             }
                         }
-                        Location location = UastAndroidUtils.getLocation(node.getNameElement());
+                        Location location = mContext.getLocation(node.getNameElement());
                         mContext.report(ISSUE, node, location,
                                         "This class implements `Parcelable` but does not "
                                         + "provide a `CREATOR` field");

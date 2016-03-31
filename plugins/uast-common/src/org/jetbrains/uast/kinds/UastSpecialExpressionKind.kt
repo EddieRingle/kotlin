@@ -16,20 +16,6 @@
 package org.jetbrains.uast
 
 class UastSpecialExpressionKind(val name: String) {
-    companion object {
-        @JvmField
-        val RETURN = UastSpecialExpressionKind("return")
-
-        @JvmField
-        val THROW = UastSpecialExpressionKind("throw")
-
-        @JvmField
-        val BREAK = UastSpecialExpressionKind("break")
-
-        @JvmField
-        val CONTINUE = UastSpecialExpressionKind("continue")
-    }
-
     override fun toString(): String{
         return "UastSpecialExpressionKind(name='$name')"
     }

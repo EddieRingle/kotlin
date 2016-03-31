@@ -92,7 +92,7 @@ public class WrongImportDetector extends Detector implements UastScanner {
         public boolean visitImportStatement(@NotNull UImportStatement node) {
             String fqn = node.getFqNameToImport();
             if (fqn != null && fqn.equals("android.R")) { //$NON-NLS-1$
-                Location location = UastAndroidUtils.getLocation(node);
+                Location location = mContext.getLocation(node);
                 mContext.report(ISSUE, node, location,
                                 "Don't include `android.R` here; use a fully qualified name for "
                                 + "each usage instead");

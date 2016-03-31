@@ -23,4 +23,7 @@ object JavaUastCallKinds {
 
     @JvmField
     val ARRAY_DIMENSIONS = UastCallKind("array_dimensions")
+
+    @JvmField
+    val ASSERT = UastCallKind("assert")
 }

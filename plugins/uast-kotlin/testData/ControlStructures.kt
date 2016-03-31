@@ -1,4 +1,8 @@
 class ControlStructures {
+    val prop = 3
+
+    fun nullFun(): String? = null
+
     fun test(): Boolean {
         if (5 > 3) {
             println("5 > 3")
@@ -21,6 +25,27 @@ class ControlStructures {
             }
         }
 
+        "" is String
+        ("" as Any) as String?
+
+        super.equals(this)
+        this.equals(this)
+
+        this@ControlStructures.equals(this)
+
+        ControlStructures::test
+        ControlStructures::prop
+        ControlStructures::class.java
+
+        outer@ for (outerVal in 1..2) {
+            inner@ for (innerVal in 3..4) {
+                continue@outer
+            }
+            break@outer
+        }
+
+        nullFun()?.let { println(it) }
+
         i = 5
         do {
             i -= 1
@@ -29,6 +54,9 @@ class ControlStructures {
         "ABC".forEach { println(it.toString()[0]) }
 
         "ABC".zip("DEF").forEach { println(it.first + " " + it.second) }
+
+        val arr = arrayOf("A", "B", "C")
+        println(arr[2])
 
         val (a, b) = "ABC".zip("DEF")
 
@@ -52,6 +80,17 @@ class ControlStructures {
             }
             false -> "!"
             else -> "A"
+        }
+
+        try {
+            5 + 1
+            throw Exception()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } catch (thr: Throwable) {
+            System.out.println("error!")
+        } finally {
+            System.out.println("finally")
         }
 
         return false

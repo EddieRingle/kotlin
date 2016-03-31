@@ -86,7 +86,7 @@ public class GetSignaturesDetector extends Detector implements UastScanner {
     private static void maybeReportIssue(
             int flagValue, UastAndroidContext context, UCallExpression node) {
         if ((flagValue & GET_SIGNATURES_FLAG) != 0) {
-            context.report(ISSUE, node, UastAndroidUtils.getLocation(node.getValueArguments().get(1)),
+            context.report(ISSUE, node, context.getLocation(node.getValueArguments().get(1)),
                 "Reading app signatures from getPackageInfo: The app signatures "
                     + "could be exploited if not validated properly; "
                     + "see issue explanation for details.");

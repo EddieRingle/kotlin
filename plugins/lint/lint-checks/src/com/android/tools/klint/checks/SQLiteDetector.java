@@ -100,7 +100,7 @@ public class SQLiteDetector extends Detector implements UastScanner {
                                  + "(STRING is a numeric type and its value can be adjusted; for example,"
                                  + "strings that look like integers can drop leading zeroes. See issue "
                                  + "explanation for details.)";
-                context.report(ISSUE, node, UastAndroidUtils.getLocation(node), message);
+                context.report(ISSUE, node, context.getLocation(node), message);
             }
         }
     }

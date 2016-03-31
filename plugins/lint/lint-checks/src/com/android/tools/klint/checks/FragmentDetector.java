@@ -98,14 +98,14 @@ public class FragmentDetector extends Detector implements UastScanner {
         if (!cls.getVisibility().isPublic()) {
             String message = String.format("This fragment class should be public (%1$s)",
                                            cls.getFqName());
-            context.report(ISSUE, cls, UastAndroidUtils.getLocation(cls.getNameElement()), message);
+            context.report(ISSUE, cls, context.getLocation(cls.getNameElement()), message);
             return;
         }
 
         if (UastUtils.getContainingClass(cls) != null && !cls.hasModifier(UastModifier.STATIC)) {
             String message = String.format(
               "This fragment inner class should be static (%1$s)", cls.getName());
-            context.report(ISSUE, cls, UastAndroidUtils.getLocation(cls.getNameElement()), message);
+            context.report(ISSUE, cls, context.getLocation(cls.getNameElement()), message);
             return;
         }
 
@@ -118,7 +118,7 @@ public class FragmentDetector extends Detector implements UastScanner {
                 if (constructor.getVisibility().isPublic()) {
                     hasDefaultConstructor = true;
                 } else {
-                    Location location = UastAndroidUtils.getLocation(constructor.getNameElement());
+                    Location location = context.getLocation(constructor.getNameElement());
                     context.report(ISSUE, constructor, location,
                                    "The default constructor must be public");
                     // Also mark that we have a constructor so we don't complain again
@@ -127,7 +127,7 @@ public class FragmentDetector extends Detector implements UastScanner {
                     hasDefaultConstructor = true;
                 }
             } else {
-                Location location = UastAndroidUtils.getLocation(constructor.getNameElement());
+                Location location = context.getLocation(constructor.getNameElement());
                 // TODO: Use separate issue for this which isn't an error
                 String message = "Avoid non-default constructors in fragments: "
                                  + "use a default constructor plus "
@@ -141,7 +141,7 @@ public class FragmentDetector extends Detector implements UastScanner {
               "This fragment should provide a default constructor (a public " +
               "constructor with no arguments) (`%1$s`)",
               cls.getName());
-            context.report(ISSUE, cls, UastAndroidUtils.getLocation(cls.getNameElement()), message);
+            context.report(ISSUE, cls, context.getLocation(cls.getNameElement()), message);
         }
     }
 }

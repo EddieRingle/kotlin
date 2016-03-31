@@ -366,12 +366,12 @@ public class SecurityDetector extends Detector implements Detector.XmlScanner, U
             @Override
             public boolean visitSimpleReferenceExpression(@NotNull USimpleReferenceExpression node) {
                 if ("MODE_WORLD_WRITEABLE".equals(node.getIdentifier())) { //$NON-NLS-1$
-                    Location location = UastAndroidUtils.getLocation(node);
+                    Location location = mContext.getLocation(node);
                     mContext.report(WORLD_WRITEABLE, node, location,
                                     "Using `MODE_WORLD_WRITEABLE` when creating files can be " +
                                     "risky, review carefully");
                 } else if ("MODE_WORLD_READABLE".equals(node.getIdentifier())) { //$NON-NLS-1$
-                    Location location = UastAndroidUtils.getLocation(node);
+                    Location location = mContext.getLocation(node);
                     mContext.report(WORLD_READABLE, node, location,
                                     "Using `MODE_WORLD_READABLE` when creating files can be " +
                                     "risky, review carefully");

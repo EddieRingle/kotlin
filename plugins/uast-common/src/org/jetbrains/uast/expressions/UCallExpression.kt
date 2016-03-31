@@ -25,7 +25,7 @@ interface UCallExpression : UExpression, UResolvable {
     val functionName: String?
     val functionNameElement: UElement?
 
-    fun functionNameMatches(name: String) = functionName == name
+    open fun functionNameMatches(name: String) = functionName == name
 
     val valueArgumentCount: Int
     val valueArguments: List<UExpression>

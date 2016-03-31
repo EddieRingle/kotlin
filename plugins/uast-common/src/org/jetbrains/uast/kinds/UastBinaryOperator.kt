@@ -105,7 +105,7 @@ open class UastBinaryOperator(override val text: String): UastOperator {
         
         @JvmField
         val DIVIDE_ASSIGN = AssignOperator("/=")
-        
+
         @JvmField
         val REMAINDER_ASSIGN = AssignOperator("%=")
         

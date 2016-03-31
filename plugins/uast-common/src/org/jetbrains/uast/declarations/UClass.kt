@@ -59,19 +59,18 @@ interface UClass : UDeclaration, UFqNamed, UModifierOwner, UAnnotated {
         annotations.acceptList(visitor)
     }
 
-    override fun renderString(): String {
-        val modifiers = listOf(UastModifier.ABSTRACT, UastModifier.FINAL, UastModifier.STATIC)
-                .filter { hasModifier(it) }.joinToString(" ") { it.name }.let { if (it.isBlank()) it else "$it " }
-
-        val name = if (isAnonymous) "" else " $name"
+    override fun renderString() = buildString {
+        appendWithSpace(visibility.name)
+        appendWithSpace(renderModifiers())
+        appendWithSpace(kind.text)
+        appendWithSpace(name)
 
         val declarations = if (declarations.isEmpty()) "" else buildString {
             appendln("{")
-            append(declarations.joinToString("\n") { it.renderString() }.withMargin)
+            append(declarations.joinToString("\n\n") { it.renderString().trim('\n') }.withMargin)
             append("\n}")
         }
-
-        return "${visibility.name} " + modifiers + kind.text + name + " " + declarations
+        append(declarations)
     }
 
     override fun logString() = "UClass ($name, kind = ${kind.text})\n" + declarations.logString()
@@ -88,7 +87,7 @@ object UClassNotResolved : UClass {
     override val defaultType = UastErrorType
     override val nameElement = null
     override val parent = null
-    override val name = "<class not resolved>"
+    override val name = ERROR_NAME
     override val fqName = null
     override val internalName = null
 

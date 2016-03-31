@@ -137,7 +137,7 @@ public class LogDetector extends Detector implements UastScanner {
                                            "conditional: surround with `if (Log.isLoggable(...))` or " +
                                            "`if (BuildConfig.DEBUG) { ... }`",
                                            node.getFunctionName());
-            context.report(CONDITIONAL, node, UastAndroidUtils.getLocation(node), message);
+            context.report(CONDITIONAL, node, context.getLocation(node), message);
         }
 
         // Check tag length
@@ -156,7 +156,7 @@ public class LogDetector extends Detector implements UastScanner {
                     String message = String.format(
                       "The logging tag can be at most 23 characters, was %1$d (%2$s)",
                       tag.length(), tag);
-                    context.report(LONG_TAG, node, UastAndroidUtils.getLocation(node), message);
+                    context.report(LONG_TAG, node, context.getLocation(node), message);
                 }
             }
         }
@@ -276,8 +276,8 @@ public class LogDetector extends Detector implements UastScanner {
             }
 
             if (!isOk) {
-                Location location = UastAndroidUtils.getLocation(logTag);
-                Location alternate = UastAndroidUtils.getLocation(isLoggableTag);
+                Location location = context.getLocation(logTag);
+                Location alternate = context.getLocation(isLoggableTag);
                 if (location != null && alternate != null) {
                     alternate.setMessage("Conflicting tag");
                     location.setSecondary(alternate);
@@ -331,8 +331,8 @@ public class LogDetector extends Detector implements UastScanner {
                 "Mismatched logging levels: when checking `isLoggable` level `%1$s`, the " +
                 "corresponding log call should be `Log.%2$s`, not `Log.%3$s`",
                 levelString, expectedCall, logCallName);
-        Location location = UastAndroidUtils.getLocation(logCall.getFunctionNameElement());
-        Location alternate = UastAndroidUtils.getLocation(isLoggableLevel);
+        Location location = context.getLocation(logCall.getFunctionNameElement());
+        Location alternate = context.getLocation(isLoggableLevel);
         if (location != null && alternate != null) {
             alternate.setMessage("Conflicting tag");
             location.setSecondary(alternate);

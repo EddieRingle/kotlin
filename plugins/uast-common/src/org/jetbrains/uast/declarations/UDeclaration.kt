@@ -26,7 +26,7 @@ interface UDeclaration : UElement, UNamed {
 }
 
 object UDeclarationNotResolved : UDeclaration {
-    override val name = "<declaration not resolved>"
+    override val name = ERROR_NAME
     override val nameElement = null
     override val parent = null
 

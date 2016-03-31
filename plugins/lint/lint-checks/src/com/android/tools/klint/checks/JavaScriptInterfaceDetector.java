@@ -146,7 +146,7 @@ public class JavaScriptInterfaceDetector extends Detector implements UastScanner
                 return;
             }
 
-            Location location = UastAndroidUtils.getLocation(node.getFunctionNameElement());
+            Location location = context.getLocation(node.getFunctionNameElement());
             String message = String.format(
               "None of the methods in the added interface (%1$s) have been annotated " +
               "with `@android.webkit.JavascriptInterface`; they will not " +

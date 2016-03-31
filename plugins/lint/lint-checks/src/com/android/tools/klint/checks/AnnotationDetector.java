@@ -127,7 +127,7 @@ public class AnnotationDetector extends Detector implements UastScanner {
                 }
             }
 
-            return false;
+            return visitAnnotation(node);
         }
 
         private boolean checkId(UAnnotation node, String id) {
@@ -144,7 +144,7 @@ public class AnnotationDetector extends Detector implements UastScanner {
                     if (parent instanceof UFunction || parent instanceof UBlockExpression) {
                         break;
                     } else if (issue == ApiDetector.UNSUPPORTED && parent instanceof UDeclarationsExpression) {
-                        UDeclarationsExpression declarations = (UDeclarationsExpression)parent;
+                        UDeclarationsExpression declarations = (UDeclarationsExpression) parent;
                         for (UVariable var : declarations.getVariables()) {
                             if (var.getKind() != UastVariableKind.MEMBER && var.getInitializer() instanceof UQualifiedExpression) {
                                 return true;
@@ -159,7 +159,7 @@ public class AnnotationDetector extends Detector implements UastScanner {
 
                 // This issue doesn't have AST access: annotations are not
                 // available for local variables or parameters
-                mContext.report(ISSUE, node, UastAndroidUtils.getLocation(node), String.format(
+                mContext.report(ISSUE, node, mContext.getLocation(node), String.format(
                     "The `@SuppressLint` annotation cannot be used on a local " +
                     "variable with the lint check '%1$s': move out to the " +
                     "surrounding method", id));

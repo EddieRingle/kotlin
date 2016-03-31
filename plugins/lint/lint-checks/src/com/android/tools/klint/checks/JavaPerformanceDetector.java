@@ -227,7 +227,7 @@ public class JavaPerformanceDetector extends Detector implements UastScanner {
                 }
             }
 
-            if (mFlagAllocations && !(UastUtils.isThrow(node.getParent())) && mCheckAllocations) {
+            if (mFlagAllocations && !(node.getParent() instanceof UThrowExpression) && mCheckAllocations) {
                 // Make sure we're still inside the method declaration that marked
                 // mInDraw as true, in case we've left it and we're in a static
                 // block or something:

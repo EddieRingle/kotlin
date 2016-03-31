@@ -19,6 +19,8 @@ package org.jetbrains.uast
 import org.jetbrains.uast.kinds.UastClassKind
 import org.jetbrains.uast.visitor.UastVisitor
 
+internal val ERROR_NAME = "<error>"
+
 tailrec fun UElement?.getContainingClass(): UClass? {
     val parent = this?.parent ?: return null
     if (parent is UClass) return parent
@@ -76,8 +78,6 @@ fun UCallExpression.getReceiver(): UExpression? = (this.parent as? UQualifiedExp
 
 fun UElement.resolveIfCan(context: UastContext): UDeclaration? = (this as? UResolvable)?.resolve(context)
 
-fun UElement.isThrow() = this is USpecialExpressionList && this.kind == UastSpecialExpressionKind.THROW
-
 fun UAnnotated.findAnnotation(fqName: String) = annotations.firstOrNull { it.fqName == fqName }
 
 fun UClass.getAllDeclarations(context: UastContext): List<UDeclaration> = mutableListOf<UDeclaration>().apply {
@@ -133,10 +133,9 @@ fun <T: UElement> UElement.getParentOfType(clazz: Class<T>): T? {
 
 fun <T> UClass.findStaticMemberOfType(name: String, type: Class<out T>): T? {
     for (companion in companions) {
-        val classKind = companion.kind as? UastClassKind.UastCompanionObject ?: continue
-        if (!classKind.default) continue
-
-        val member = companion.declarations.firstOrNull { it.name == name && type.isInstance(it) }
+        val member = companion.declarations.firstOrNull {
+            it.name == name && type.isInstance(it) && it is UModifierOwner && it.hasModifier(UastModifier.STATIC)
+        }
         @Suppress("UNCHECKED_CAST")
         if (member != null) return member as T
     }

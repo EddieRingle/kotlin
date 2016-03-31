@@ -17,8 +17,6 @@
 package org.jetbrains.uast.kinds
 
 open class UastClassKind(val text: String) {
-    class UastCompanionObject(val default: Boolean) : UastClassKind("companion object")
-
     companion object {
         @JvmField
         val CLASS = UastClassKind("class")

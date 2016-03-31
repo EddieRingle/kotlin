@@ -115,7 +115,7 @@ public class IntellijRegistrationDetector extends RegistrationDetector implement
       return;
     }
     String tag = classToTag(internalName);
-    Location location = UastAndroidUtils.getLocation(clz);
+    Location location = context.getLocation(clz);
     String fqcn = clz.getFqName();
     if (fqcn == null) {
       fqcn = clz.getName();

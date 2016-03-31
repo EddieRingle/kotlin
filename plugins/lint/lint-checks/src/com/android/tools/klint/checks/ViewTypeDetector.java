@@ -337,7 +337,7 @@ public class ViewTypeDetector extends ResourceXmlDetector implements UastScanner
             String message = String.format(
                     "Unexpected cast to `%1$s`: layout tag was `%2$s`",
                     castType, layoutType);
-            context.report(ISSUE, node, UastAndroidUtils.getLocation(node), message);
+            context.report(ISSUE, node, context.getLocation(node), message);
         }
     }
 }

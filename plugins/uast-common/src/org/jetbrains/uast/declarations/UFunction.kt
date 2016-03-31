@@ -42,15 +42,24 @@ interface UFunction : UDeclaration, UModifierOwner, UAnnotated {
         returnType?.accept(visitor)
     }
 
-    override fun renderString(): String {
-        val typeParameters = if (typeParameterCount == 0) "" else "<" + typeParameters.joinToString { it.renderString() } + "> "
-        val valueParameters = valueParameters.joinToString { it.renderString() }
-        val returnType = returnType?.let { ": " + it.renderString() } ?: ""
+    override fun renderString(): String = buildString {
+        appendWithSpace(visibility.name)
+        appendWithSpace(renderModifiers())
+        append("fun ")
+        if (typeParameterCount > 0) {
+            append('<').append(typeParameters.joinToString { it.renderString() }).append("> ")
+        }
+        append(name)
+        append('(')
+        append(valueParameters.joinToString() { it.renderString() })
+        append(')')
+        returnType?.let { append(": " + it.renderString()) }
+
         val body = when (body) {
             is UBlockExpression -> " " + body.renderString()
             else -> " = " + body.renderString()
         }
-        return "${visibility.name} fun " + typeParameters + name + "(" + valueParameters + ")" + returnType + body
+        append(body)
     }
 
     override fun logString() = "UFunction ($name, kind = ${kind.text}, " +
@@ -58,7 +67,7 @@ interface UFunction : UDeclaration, UModifierOwner, UAnnotated {
 }
 
 object UFunctionNotResolved : UFunction {
-    override val kind = UastFunctionKind("<unknown>")
+    override val kind = UastFunctionKind(ERROR_NAME)
     override val valueParameters = emptyList<UVariable>()
     override val valueParameterCount = 0
     override val typeParameters = emptyList<UTypeReference>()
@@ -68,7 +77,7 @@ object UFunctionNotResolved : UFunction {
     override val visibility = UastVisibility.PRIVATE
     override val nameElement = null
     override val parent = null
-    override val name = "<function not resolved>"
+    override val name = ERROR_NAME
 
     override fun hasModifier(modifier: UastModifier) = false
     override fun getSuperFunctions(context: UastContext) = emptyList<UFunction>()

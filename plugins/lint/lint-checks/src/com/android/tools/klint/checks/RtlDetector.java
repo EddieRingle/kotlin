@@ -624,7 +624,7 @@ public class RtlDetector extends LayoutDetector implements UastScanner {
               + "behavior in right-to-left locales",
               (isLeft ? GRAVITY_VALUE_START : GRAVITY_VALUE_END).toUpperCase(Locale.US),
               (isLeft ? GRAVITY_VALUE_LEFT : GRAVITY_VALUE_RIGHT).toUpperCase(Locale.US));
-            Location location = UastAndroidUtils.getLocation(node);
+            Location location = mContext.getLocation(node);
             mContext.report(USE_START, node, location, message);
 
             return true;

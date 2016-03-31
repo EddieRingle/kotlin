@@ -19,7 +19,7 @@ import org.jetbrains.uast.visitor.UastVisitor
 
 interface UClassLiteralExpression : UExpression {
     override fun logString() = "UClassLiteralExpression"
-    override fun renderString() = getExpressionType()?.name ?: "::class"
+    override fun renderString() = type.name + "::class"
 
     val type: UType
 

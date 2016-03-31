@@ -104,7 +104,7 @@ public class CallSuperDetector extends Detector implements UastScanner {
                 String methodName = declaration.getName();
                 String message = "Overriding method should call `super."
                         + methodName + "`";
-                Location location = UastAndroidUtils.getLocation(declaration.getNameElement());
+                Location location = context.getLocation(declaration.getNameElement());
                 context.report(ISSUE, declaration, location, message);
             }
         }

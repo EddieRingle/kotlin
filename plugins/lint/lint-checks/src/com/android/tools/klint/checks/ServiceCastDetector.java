@@ -103,7 +103,7 @@ public class ServiceCastDetector extends Detector implements UastScanner {
                     String message = String.format(
                       "Suspicious cast to `%1$s` for a `%2$s`: expected `%3$s`",
                       stripPackage(castType), name, stripPackage(expectedClass));
-                    context.report(ISSUE, node, UastAndroidUtils.getLocation(cast), message);
+                    context.report(ISSUE, node, context.getLocation(cast), message);
                 }
             }
         }

@@ -60,7 +60,7 @@ object UastErrorType : UType, NoAnnotations {
     override val isChar = false
     override val isByte = false
     override val parent = null
-    override val name = "<error>"
+    override val name = ERROR_NAME
     override val fqName = null
     override val isBoolean = false
     override fun resolve(context: UastContext) = null

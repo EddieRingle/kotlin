@@ -130,7 +130,7 @@ public class WrongCallDetector extends Detector implements UastScanner {
                 // Keep in sync with {@link #getOldValue} and {@link #getNewValue} below!
                 "Suspicious method call; should probably call \"`%1$s`\" rather than \"`%2$s`\"",
                 suggestion, name);
-        context.report(ISSUE, node, UastAndroidUtils.getLocation(node.getFunctionReference()), message);
+        context.report(ISSUE, node, context.getLocation(node.getFunctionReference()), message);
     }
 
     /**

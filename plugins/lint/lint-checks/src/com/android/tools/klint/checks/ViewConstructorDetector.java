@@ -140,7 +140,7 @@ public class ViewConstructorDetector extends Detector implements UastScanner {
               + "`(Context)` or `(Context,AttributeSet)` "
               + "or `(Context,AttributeSet,int)`",
               node.getFqName());
-            Location location = UastAndroidUtils.getLocation(node.getNameElement());
+            Location location = context.getLocation(node.getNameElement());
             context.report(ISSUE, node, location, message  /*data*/);
         }
     }

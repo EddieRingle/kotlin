@@ -65,7 +65,7 @@ public class SetJavaScriptEnabledDetector extends Detector implements UastScanne
 
         Object value = node.getValueArguments().get(0).evaluate();
         if (value instanceof Boolean && (Boolean) value) {
-            context.report(ISSUE, node, UastAndroidUtils.getLocation(node),
+            context.report(ISSUE, node, context.getLocation(node),
                            "Using `setJavaScriptEnabled` can introduce XSS vulnerabilities " +
                            "into you application, review carefully.");
         }

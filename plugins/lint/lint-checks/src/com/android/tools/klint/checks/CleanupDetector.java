@@ -286,7 +286,7 @@ public class CleanupDetector extends Detector implements UastScanner {
         }
         UElement locationNode = node instanceof UCallExpression ?
                 ((UCallExpression) node).getFunctionNameElement() : node;
-        Location location = UastAndroidUtils.getLocation(locationNode);
+        Location location = context.getLocation(locationNode);
         context.report(RECYCLE_RESOURCE, node, location, message);
     }
 
@@ -353,7 +353,7 @@ public class CleanupDetector extends Detector implements UastScanner {
             }
 
             String message = "This transaction should be completed with a `commit()` call";
-            context.report(COMMIT_FRAGMENT, node, UastAndroidUtils.getLocation(node.getFunctionReference()),
+            context.report(COMMIT_FRAGMENT, node, context.getLocation(node.getFunctionReference()),
                            message);
         }
         return false;
@@ -565,15 +565,13 @@ public class CleanupDetector extends Detector implements UastScanner {
         }
 
         @Override
-        public boolean visitSpecialExpressionList(@NotNull USpecialExpressionList node) {
-            if (node.getKind() == UastSpecialExpressionKind.RETURN) {
-                UExpression value = node.firstOrNull();
-                if (value instanceof USimpleReferenceExpression) {
-                    UDeclaration resolved = ((USimpleReferenceExpression) value).resolve(mContext);
-                    //noinspection SuspiciousMethodCalls
-                    if (resolved != null && mVariables.contains(resolved)) {
-                        mEscapes = true;
-                    }
+        public boolean visitReturnExpression(@NotNull UReturnExpression node) {
+            UExpression value = node.getReturnExpression();
+            if (value instanceof USimpleReferenceExpression) {
+                UDeclaration resolved = ((USimpleReferenceExpression) value).resolve(mContext);
+                //noinspection SuspiciousMethodCalls
+                if (resolved != null && mVariables.contains(resolved)) {
+                    mEscapes = true;
                 }
             }
 

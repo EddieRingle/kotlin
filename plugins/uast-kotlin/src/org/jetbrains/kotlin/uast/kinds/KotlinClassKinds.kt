@@ -20,8 +20,5 @@ import org.jetbrains.uast.kinds.UastClassKind
 
 object KotlinClassKinds {
     @JvmField
-    val DEFAULT_COMPANION_OBJECT = UastClassKind.UastCompanionObject(true)
-
-    @JvmField
-    val NAMED_COMPANION_OBJECT = UastClassKind.UastCompanionObject(false)
+    val COMPANION_OBJECT = UastClassKind("companion object")
 }

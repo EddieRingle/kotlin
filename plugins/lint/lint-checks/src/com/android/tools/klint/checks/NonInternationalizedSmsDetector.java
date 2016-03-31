@@ -95,7 +95,7 @@ public class NonInternationalizedSmsDetector extends Detector implements UastSca
                 String number = (String) ((ULiteralExpression) destinationAddress).getValue();
 
                 if (number != null && !number.startsWith("+")) {  //$NON-NLS-1$
-                    context.report(ISSUE, node, UastAndroidUtils.getLocation(destinationAddress),
+                    context.report(ISSUE, node, context.getLocation(destinationAddress),
                                    "To make sure the SMS can be sent by all users, please start the SMS number " +
                                    "with a + and a country code or restrict the code invocation to people in the country " +
                                    "you are targeting.");

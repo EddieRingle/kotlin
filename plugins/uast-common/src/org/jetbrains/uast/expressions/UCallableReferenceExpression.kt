@@ -17,14 +17,29 @@ package org.jetbrains.uast
 
 import org.jetbrains.uast.visitor.UastVisitor
 
-interface UCallableReferenceExpression : UExpression {
-    val qualifierType: UType
+interface UCallableReferenceExpression : UExpression, UResolvable {
+    /* Can be null if the qualifier is a type */
+    val qualifierExpression: UExpression?
+
+    /* Can be null if the qualifier is an expression */
+    val qualifierType: UType?
+
+    val callableName: String
 
     override fun accept(visitor: UastVisitor) {
         if (visitor.visitCallableReferenceExpression(this)) return
-        qualifierType.accept(visitor)
+        qualifierExpression?.accept(visitor)
+        qualifierType?.accept(visitor)
     }
 
     override fun logString() = "UCallableReferenceExpression"
-    override fun renderString() = "::" + qualifierType.name
+    override fun renderString() = buildString {
+        qualifierExpression?.let {
+            append(it.renderString())
+        } ?: qualifierType?.let {
+            append(it.name)
+        }
+        append("::")
+        append(callableName)
+    }
 }

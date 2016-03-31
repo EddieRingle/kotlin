@@ -110,13 +110,13 @@ public class SdCardDetector extends Detector implements UastScanner {
                 || s.startsWith("file:///sdcard/")) {      //$NON-NLS-1$
                 String message = "Do not hardcode \"/sdcard/\"; " +
                                  "use `Environment.getExternalStorageDirectory().getPath()` instead";
-                Location location = UastAndroidUtils.getLocation(node);
+                Location location = mContext.getLocation(node);
                 mContext.report(ISSUE, node, location, message);
             } else if (s.startsWith("/data/data/")    //$NON-NLS-1$
                        || s.startsWith("/data/user/")) { //$NON-NLS-1$
                 String message = "Do not hardcode \"`/data/`\"; " +
                                  "use `Context.getFilesDir().getPath()` instead";
-                Location location = UastAndroidUtils.getLocation(node);
+                Location location = mContext.getLocation(node);
                 mContext.report(ISSUE, node, location, message);
             }
 

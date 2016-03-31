@@ -61,13 +61,13 @@ public class AddJavascriptInterfaceDetector extends Detector implements UastScan
     private static final String WEB_VIEW = "android.webkit.WebView"; //$NON-NLS-1$
     private static final String ADD_JAVASCRIPT_INTERFACE = "addJavascriptInterface"; //$NON-NLS-1$
 
-    // ---- Implements UastScanner ----
-
     @NonNull
     @Override
     public Speed getSpeed() {
         return Speed.FAST;
     }
+
+    // ---- Implements UastScanner ----
 
     @Nullable
     @Override
@@ -95,6 +95,6 @@ public class AddJavascriptInterfaceDetector extends Detector implements UastScan
 
         String message = "`WebView.addJavascriptInterface` should not be called with minSdkVersion < 17 for security reasons: " +
                          "JavaScript can use reflection to manipulate application";
-        context.report(ISSUE, node, UastAndroidUtils.getLocation(node), message);
+        context.report(ISSUE, node, context.getLocation(node), message);
     }
 }

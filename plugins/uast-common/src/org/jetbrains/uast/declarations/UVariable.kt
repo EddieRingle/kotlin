@@ -23,10 +23,7 @@ interface UVariable : UDeclaration, UModifierOwner, UAnnotated {
     val type: UType
     val visibility: UastVisibility
 
-    open val getters: List<UFunction>?
-        get() = null
-
-    open val setters: List<UFunction>?
+    open val accessors: List<UFunction>?
         get() = null
 
     override fun accept(visitor: UastVisitor) {
@@ -37,11 +34,25 @@ interface UVariable : UDeclaration, UModifierOwner, UAnnotated {
         type.accept(visitor)
     }
 
-    override fun renderString(): String {
-        val initializer = if (initializer != null && initializer !is EmptyExpression) " = ${initializer!!.renderString()}" else ""
-        val prefix = if (kind == UastVariableKind.VALUE_PARAMETER) "" else "var "
-        val emptyLine = if (kind == UastVariableKind.MEMBER) "\n" else ""
-        return "$prefix$name: " + type.name + initializer + emptyLine
+    override fun renderString(): String = buildString {
+        if (kind != UastVariableKind.VALUE_PARAMETER) appendWithSpace(visibility.name)
+        appendWithSpace(renderModifiers())
+        if (kind != UastVariableKind.VALUE_PARAMETER) append("var ")
+        append(name)
+        append(": ")
+        append(type.name)
+        if (initializer != null && initializer !is EmptyExpression) {
+            append(" = ")
+            append(initializer!!.renderString())
+        }
+
+        accessors?.let {
+            appendln()
+            it.forEachIndexed { i, accessor ->
+                this@buildString.append(accessor.renderString().withMargin)
+                if ((i + 1) < it.size) appendln()
+            }
+        }
     }
 
     override fun logString() = "UVariable ($name, kind = ${kind.name})\n" +
@@ -50,11 +61,11 @@ interface UVariable : UDeclaration, UModifierOwner, UAnnotated {
 
 object UVariableNotResolved : UVariable {
     override val initializer = null
-    override val kind = UastVariableKind.MEMBER
+    override val kind = UastVariableKind(ERROR_NAME)
     override val type = UastErrorType
     override val nameElement = null
     override val parent = null
-    override val name = "<variable not resolved>"
+    override val name = ERROR_NAME
     override val visibility = UastVisibility.LOCAL
 
     override fun hasModifier(modifier: UastModifier) = false

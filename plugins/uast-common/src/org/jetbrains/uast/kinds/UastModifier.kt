@@ -24,9 +24,13 @@ class UastModifier(val name: String) {
         @JvmField
         val FINAL = UastModifier("final")
         @JvmField
+        val IMMUTABLE = UastModifier("immutable")
+        @JvmField
         val VARARG = UastModifier("vararg")
         @JvmField
         val OVERRIDE = UastModifier("override")
+
+        val VALUES = listOf(ABSTRACT, STATIC, FINAL, IMMUTABLE, VARARG, OVERRIDE)
     }
 
     override fun toString(): String{

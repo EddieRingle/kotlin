@@ -137,7 +137,7 @@ public class CustomViewDetector extends Detector implements UastScanner {
                       + "should have the same name (various editor features rely on "
                       + "this convention)",
                       className, styleableName);
-                    context.report(ISSUE, node, UastAndroidUtils.getLocation(expression), message);
+                    context.report(ISSUE, node, context.getLocation(expression), message);
                 }
             } else if (resolvedClass.isSubclassOf(CLASS_VIEWGROUP + DOT_LAYOUT_PARAMS)) {
                 UClass outer = UastUtils.getContainingClass(resolvedClass);
@@ -153,7 +153,7 @@ public class CustomViewDetector extends Detector implements UastScanner {
                       + "class (`%3$s`) plus \"`_Layout`\", e.g. `%4$s`. "
                       + "(Various editor features rely on this convention.)",
                       styleableName, className, layoutClassName, expectedName);
-                    context.report(ISSUE, node, UastAndroidUtils.getLocation(expression), message);
+                    context.report(ISSUE, node, context.getLocation(expression), message);
                 }
             }
         }

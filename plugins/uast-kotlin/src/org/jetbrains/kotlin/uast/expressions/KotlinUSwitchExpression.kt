@@ -85,8 +85,13 @@ class KotlinUSwitchEntry(
                 is KtBlockExpression -> exprPsi.statements.map { KotlinConverter.convert(it, this) }
                 else -> listOf(KotlinConverter.convertOrEmpty(exprPsi, this))
             }
-            expressions = userExpressions + KotlinUSpecialExpressionList.Empty(
-                    exprPsi ?: this@KotlinUSwitchEntry.psi, UastSpecialExpressionKind.BREAK, parent)
+            parent
+            expressions = userExpressions + object : UBreakExpression {
+                override val label: String?
+                    get() = null
+                override val parent: UElement?
+                    get() = this@KotlinUSwitchEntry
+            }
         }
     }
 

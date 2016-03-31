@@ -107,7 +107,7 @@ public class ToastDetector extends Detector implements UastScanner {
         ShowFinder finder = new ShowFinder(nodeWithPossibleQualifier);
         method.accept(finder);
         if (!finder.isShowCalled()) {
-            context.report(ISSUE, node, UastAndroidUtils.getLocation(node),
+            context.report(ISSUE, node, context.getLocation(node),
                            "Toast created but not shown: did you forget to call `show()` ?");
         }
     }
@@ -147,9 +147,8 @@ public class ToastDetector extends Detector implements UastScanner {
         }
 
         @Override
-        public boolean visitSpecialExpressionList(@NotNull USpecialExpressionList node) {
-            if (node.getKind() == UastSpecialExpressionKind.RETURN && node.firstOrNull() == mTarget) {
-                // If you just do "return Toast.makeText(...) don't warn
+        public boolean visitReturnExpression(@NotNull UReturnExpression node) {
+            if (mTarget.equals(node.getReturnExpression())) {
                 mFound = true;
             }
 

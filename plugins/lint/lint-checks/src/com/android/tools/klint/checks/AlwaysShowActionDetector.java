@@ -224,18 +224,18 @@ public class AlwaysShowActionDetector extends ResourceXmlDetector implements Uas
                 if (isAlways) {
                     JavaContext lintContext = mContext.getLintContext();
                     if (lintContext.getDriver().isSuppressed(lintContext, ISSUE, node)) {
-                        return false;
+                        return super.visitQualifiedExpression(node);
                     }
                     if (mAlwaysFields == null) {
                         mAlwaysFields = new ArrayList<Location>();
                     }
-                    mAlwaysFields.add(UastAndroidUtils.getLocation(node));
+                    mAlwaysFields.add(mContext.getLocation(node));
                 } else {
                     mHasIfRoomRefs = true;
                 }
             }
 
-            return false;
+            return super.visitQualifiedExpression(node);
         }
     }
 }

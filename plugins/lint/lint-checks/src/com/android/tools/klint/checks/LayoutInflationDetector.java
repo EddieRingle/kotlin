@@ -186,11 +186,11 @@ public class LayoutInflationDetector extends LayoutDetector implements UastScann
                         if (mPendingErrors == null) {
                             mPendingErrors = Lists.newArrayList();
                         }
-                        Location location = UastAndroidUtils.getLocation(second);
+                        Location location = context.getLocation(second);
                         mPendingErrors.add(Pair.of(layoutName, location));
                     }
                 } else if (hasLayoutParams(lintContext, layoutName)) {
-                    context.report(ISSUE, node, UastAndroidUtils.getLocation(second), ERROR_MESSAGE);
+                    context.report(ISSUE, node, context.getLocation(second), ERROR_MESSAGE);
                 }
             }
         }
