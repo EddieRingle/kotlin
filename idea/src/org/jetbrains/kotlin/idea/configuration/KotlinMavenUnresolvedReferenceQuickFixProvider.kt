@@ -45,6 +45,7 @@ import org.jetbrains.kotlin.idea.util.application.runWriteAction
 import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
+import org.jetbrains.kotlin.psi.KtTypeReference
 import org.jetbrains.kotlin.psi.psiUtil.createSmartPointer
 import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import java.util.*
@@ -67,8 +68,10 @@ class KotlinMavenUnresolvedReferenceQuickFixProvider : UnresolvedReferenceQuickF
             } else {
                 importDirective.importedFqName?.asString()
             }
-        } else {
-            val referenced = expression.getReferencedName()
+        }
+        else {
+            val typeReference = expression.getParentOfType<KtTypeReference>(true)
+            val referenced = typeReference?.text ?: expression.getReferencedName()
 
             expression.getContainingKtFile()
                     .importDirectives
