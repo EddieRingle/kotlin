@@ -42,9 +42,11 @@ import org.jetbrains.kotlin.idea.quickfix.KotlinIntentionActionFactoryWithDelega
 import org.jetbrains.kotlin.idea.quickfix.QuickFixWithDelegateFactory
 import org.jetbrains.kotlin.idea.references.KtSimpleNameReference
 import org.jetbrains.kotlin.idea.util.application.runWriteAction
+import org.jetbrains.kotlin.psi.KtImportDirective
 import org.jetbrains.kotlin.psi.KtNameReferenceExpression
 import org.jetbrains.kotlin.psi.KtSimpleNameExpression
 import org.jetbrains.kotlin.psi.psiUtil.createSmartPointer
+import org.jetbrains.kotlin.psi.psiUtil.getParentOfType
 import java.util.*
 
 class KotlinMavenUnresolvedReferenceQuickFixProvider : UnresolvedReferenceQuickFixProvider<KtSimpleNameReference>() {
@@ -56,8 +58,28 @@ class KotlinMavenUnresolvedReferenceQuickFixProvider : UnresolvedReferenceQuickF
             return
         }
 
-        val name = ref.expression.getReferencedName()
-        registrar.register(AddMavenDependencyQuickFix(name, ref.expression.createSmartPointer()))
+        val expression = ref.expression
+        val importDirective = expression.getParentOfType<KtImportDirective>(true)
+
+        val name = if (importDirective != null) {
+            if (importDirective.isAllUnder) {
+                null
+            } else {
+                importDirective.importedFqName?.asString()
+            }
+        } else {
+            val referenced = expression.getReferencedName()
+
+            expression.getContainingKtFile()
+                    .importDirectives
+                    .firstOrNull { !it.isAllUnder && it.aliasName == referenced || it.importedFqName?.shortName()?.asString() == referenced }
+                    ?.let { it.importedFqName?.asString() }
+                    ?: referenced
+        }
+
+        if (name != null) {
+            registrar.register(AddMavenDependencyQuickFix(name, expression.createSmartPointer()))
+        }
     }
 }
 
