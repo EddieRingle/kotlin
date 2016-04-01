@@ -165,10 +165,12 @@ public abstract class KotlinBuiltIns {
 
 
         public final FqName throwable = fqName("Throwable");
+        public final FqName comparable = fqName("Comparable");
 
         public final FqName deprecated = fqName("Deprecated");
         public final FqName deprecationLevel = fqName("DeprecationLevel");
         public final FqName extensionFunctionType = fqName("ExtensionFunctionType");
+        public final FqName annotation = annotationName("Annotation");
         public final FqName target = annotationName("Target");
         public final FqName annotationTarget = annotationName("AnnotationTarget");
         public final FqName annotationRetention = annotationName("AnnotationRetention");
@@ -298,6 +300,13 @@ public abstract class KotlinBuiltIns {
         return null;
     }
 
+    @NotNull
+    public ClassDescriptor getBuiltInClassByFqName(@NotNull FqName fqName) {
+        ClassDescriptor descriptor = getBuiltInClassByFqNameNullable(fqName);
+        assert descriptor != null : "Can't find built-in class " + fqName;
+        return descriptor;
+    }
+
     @Nullable
     private static ClassDescriptor getBuiltInClassByNameNullable(@NotNull Name simpleName, @NotNull PackageFragmentDescriptor packageFragment) {
         ClassifierDescriptor classifier = packageFragment.getMemberScope().getContributedClassifier(
@@ -406,6 +415,11 @@ public abstract class KotlinBuiltIns {
     @NotNull
     public static String getFunctionName(int parameterCount) {
         return "Function" + parameterCount;
+    }
+
+    @NotNull
+    public static FqName getFunctionFqName(int parameterCount) {
+        return BUILT_INS_PACKAGE_FQ_NAME.child(Name.identifier(getFunctionName(parameterCount)));
     }
 
     @NotNull
@@ -913,6 +927,10 @@ public abstract class KotlinBuiltIns {
         }
 
         return false;
+    }
+
+    public static FqName getPrimitiveFqName(@NotNull PrimitiveType primitiveType) {
+        return BUILT_INS_PACKAGE_FQ_NAME.child(primitiveType.getTypeName());
     }
 
     public static boolean isSuppressAnnotation(@NotNull AnnotationDescriptor annotationDescriptor) {

@@ -44,6 +44,7 @@ import org.jetbrains.eval4j.jdi.JDIEval
 import org.jetbrains.eval4j.jdi.asJdiValue
 import org.jetbrains.eval4j.jdi.asValue
 import org.jetbrains.eval4j.jdi.makeInitialFrame
+import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.caches.resolve.KotlinCacheService
 import org.jetbrains.kotlin.codegen.*
 import org.jetbrains.kotlin.codegen.binding.CodegenBinding
@@ -557,7 +558,7 @@ fun Type.getClassDescriptor(project: Project): ClassDescriptor? {
 
     val jvmName = JvmClassName.byInternalName(internalName).fqNameForClassNameWithoutDollars
 
-    val platformClasses = JavaToKotlinClassMap.INSTANCE.mapPlatformClass(jvmName)
+    val platformClasses = JavaToKotlinClassMap.INSTANCE.mapPlatformClass(jvmName, DefaultBuiltIns.Instance)
     if (platformClasses.isNotEmpty()) return platformClasses.first()
 
     return runReadAction {
