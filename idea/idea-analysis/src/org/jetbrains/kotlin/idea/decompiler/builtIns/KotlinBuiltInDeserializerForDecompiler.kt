@@ -20,6 +20,8 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.vfs.VirtualFile
 import org.jetbrains.kotlin.builtins.BuiltInSerializerProtocol
 import org.jetbrains.kotlin.builtins.BuiltInsClassDataFinder
+import org.jetbrains.kotlin.builtins.DefaultBuiltIns
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.idea.decompiler.textBuilder.DeserializerForDecompilerBase
 import org.jetbrains.kotlin.idea.decompiler.textBuilder.LoggingErrorReporter
@@ -38,6 +40,7 @@ class KotlinBuiltInDeserializerForDecompiler(
         private val nameResolver: NameResolver
 ) : DeserializerForDecompilerBase(packageDirectory, packageFqName) {
     override val targetPlatform: TargetPlatform get() = TargetPlatform.Default
+    override val builtIns: KotlinBuiltIns get() = DefaultBuiltIns.Instance
 
     override val deserializationComponents: DeserializationComponents
 
@@ -47,7 +50,7 @@ class KotlinBuiltInDeserializerForDecompiler(
         deserializationComponents = DeserializationComponents(
                 storageManager, moduleDescriptor, BuiltInsClassDataFinder(proto, nameResolver),
                 AnnotationAndConstantLoaderImpl(moduleDescriptor, notFoundClasses, BuiltInSerializerProtocol), packageFragmentProvider,
-                ResolveEverythingToKotlinAnyLocalClassResolver(targetPlatform.builtIns), LoggingErrorReporter(LOG),
+                ResolveEverythingToKotlinAnyLocalClassResolver(builtIns), LoggingErrorReporter(LOG),
                 LookupTracker.DO_NOTHING, FlexibleTypeCapabilitiesDeserializer.ThrowException, ClassDescriptorFactory.EMPTY,
                 notFoundClasses
         )

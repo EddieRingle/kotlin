@@ -18,6 +18,7 @@ package org.jetbrains.kotlin.idea.decompiler.classFile
 
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.vfs.VirtualFile
+import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.idea.caches.IDEKotlinBinaryClassCache
 import org.jetbrains.kotlin.idea.decompiler.textBuilder.DeserializerForDecompilerBase
@@ -28,6 +29,7 @@ import org.jetbrains.kotlin.load.java.structure.JavaClass
 import org.jetbrains.kotlin.load.kotlin.*
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.platform.JvmBuiltIns
 import org.jetbrains.kotlin.resolve.TargetPlatform
 import org.jetbrains.kotlin.resolve.jvm.platform.JvmPlatform
 import org.jetbrains.kotlin.serialization.ClassDataWithSource
@@ -50,6 +52,7 @@ class DeserializerForClassfileDecompiler(
         directoryPackageFqName: FqName
 ) : DeserializerForDecompilerBase(packageDirectory, directoryPackageFqName) {
     override val targetPlatform: TargetPlatform get() = JvmPlatform
+    override val builtIns: KotlinBuiltIns get() = JvmBuiltIns.Instance
 
     private val classFinder = DirectoryBasedClassFinder(packageDirectory, directoryPackageFqName)
 
@@ -64,7 +67,7 @@ class DeserializerForClassfileDecompiler(
 
         deserializationComponents = DeserializationComponents(
                 storageManager, moduleDescriptor, classDataFinder, annotationAndConstantLoader, packageFragmentProvider,
-                ResolveEverythingToKotlinAnyLocalClassResolver(targetPlatform.builtIns), errorReporter,
+                ResolveEverythingToKotlinAnyLocalClassResolver(builtIns), errorReporter,
                 LookupTracker.DO_NOTHING, JavaFlexibleTypeCapabilitiesDeserializer, ClassDescriptorFactory.EMPTY, notFoundClasses
         )
     }
