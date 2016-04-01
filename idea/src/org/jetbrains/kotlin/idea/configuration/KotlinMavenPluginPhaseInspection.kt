@@ -81,14 +81,14 @@ class KotlinMavenPluginPhaseInspection : DomElementsInspection<MavenDomProjectMo
             }
             else {
                 if (hasJavaFiles) {
-                    pom.findKotlinExecutions(kotlinPlugin, PomFile.KotlinGoals.Compile).notAtPhase(PomFile.DefaultPhases.ProcessSources).forEach { badExecution ->
+                    pom.findExecutions(kotlinPlugin, PomFile.KotlinGoals.Compile).notAtPhase(PomFile.DefaultPhases.ProcessSources).forEach { badExecution ->
                         holder.createProblem(badExecution.phase.createStableCopy(),
                                              HighlightSeverity.WARNING,
                                              "Kotlin plugin should run before javac so kotlin classes could be visible from Java",
                                              FixExecutionPhaseLocalFix(badExecution, PomFile.DefaultPhases.ProcessSources))
                     }
 
-                    pom.findKotlinExecutions(kotlinPlugin, PomFile.KotlinGoals.Js, PomFile.KotlinGoals.TestJs).forEach { badExecution ->
+                    pom.findExecutions(kotlinPlugin, PomFile.KotlinGoals.Js, PomFile.KotlinGoals.TestJs).forEach { badExecution ->
                         holder.createProblem(badExecution.goals.goals.first { it.isJsGoal() }.createStableCopy(),
                                              HighlightSeverity.WARNING,
                                              "JavaScript goal configured for module with Java files")
