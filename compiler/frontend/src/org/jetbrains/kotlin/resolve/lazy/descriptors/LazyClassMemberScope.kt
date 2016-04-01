@@ -192,7 +192,7 @@ open class LazyClassMemberScope(
             if (descriptor.kind != FAKE_OVERRIDE && descriptor.kind != DELEGATION) {
                 OverridingUtil.resolveUnknownVisibilityForMember(descriptor, OverrideResolver.createCannotInferVisibilityReporter(trace))
             }
-            VarianceChecker.recordPrivateToThisIfNeeded(trace, descriptor);
+            VarianceChecker(trace).recordPrivateToThisIfNeeded(descriptor);
         }
     }
 

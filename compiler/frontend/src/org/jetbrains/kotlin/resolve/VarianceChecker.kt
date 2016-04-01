@@ -46,8 +46,9 @@ import org.jetbrains.kotlin.descriptors.VariableDescriptor
 import org.jetbrains.kotlin.psi.KtTypeParameterListOwner
 import org.jetbrains.kotlin.resolve.BindingContext
 
+class ManualVariance(val descriptor: TypeParameterDescriptor, val variance: Variance)
 
-class VarianceChecker(private val trace: BindingTrace) {
+class VarianceChecker(private val trace: BindingTrace, private val manualVariance: ManualVariance? = null) {
 
     fun check(c: TopDownAnalysisContext) {
         checkClasses(c)
@@ -58,9 +59,9 @@ class VarianceChecker(private val trace: BindingTrace) {
         for (jetClassOrObject in c.declaredClasses!!.keys) {
             if (jetClassOrObject is KtClass) {
                 for (specifier in jetClassOrObject.getSuperTypeListEntries()) {
-                    specifier.typeReference?.checkTypePosition(trace.bindingContext, OUT_VARIANCE, trace)
+                    specifier.typeReference?.checkTypePosition(trace.bindingContext, OUT_VARIANCE)
                 }
-                jetClassOrObject.checkTypeParameters(trace.bindingContext, OUT_VARIANCE, trace)
+                jetClassOrObject.checkTypeParameters(trace.bindingContext, OUT_VARIANCE)
             }
         }
     }
@@ -68,10 +69,13 @@ class VarianceChecker(private val trace: BindingTrace) {
     private fun checkMembers(c: TopDownAnalysisContext) {
         for ((declaration, descriptor) in c.members) {
             if (!Visibilities.isPrivate(descriptor.visibility)) {
-                checkCallableDeclaration(trace.bindingContext, declaration, descriptor, trace)
+                checkCallableDeclaration(trace.bindingContext, declaration, descriptor)
             }
         }
     }
+
+    private fun TypeParameterDescriptor.varianceWithManual() =
+            if (manualVariance != null && this == manualVariance.descriptor) manualVariance.variance else variance
 
     class VarianceConflictDiagnosticData(
             val containingType: KotlinType,
@@ -79,19 +83,98 @@ class VarianceChecker(private val trace: BindingTrace) {
             val occurrencePosition: Variance
     )
 
-    companion object {
-        @JvmStatic
-        fun recordPrivateToThisIfNeeded(trace: BindingTrace, descriptor: CallableMemberDescriptor) {
-            if (isIrrelevant(descriptor) || descriptor.visibility != Visibilities.PRIVATE) return
+    fun recordPrivateToThisIfNeeded(descriptor: CallableMemberDescriptor) {
+        if (isIrrelevant(descriptor) || descriptor.visibility != Visibilities.PRIVATE) return
 
-            val psiElement = descriptor.source.getPsi()
-            if (psiElement !is KtCallableDeclaration) return
+        val psiElement = descriptor.source.getPsi()
+        if (psiElement !is KtCallableDeclaration) return
 
-            if (!checkCallableDeclaration(trace.bindingContext, psiElement, descriptor, DiagnosticSink.DO_NOTHING)) {
-                recordPrivateToThis(descriptor)
-            }
+        if (!checkCallableDeclaration(trace.bindingContext, psiElement, descriptor, DiagnosticSink.DO_NOTHING)) {
+            recordPrivateToThis(descriptor)
+        }
+    }
+
+    private fun checkCallableDeclaration(
+            trace: BindingContext,
+            declaration: KtCallableDeclaration,
+            descriptor: CallableDescriptor,
+            diagnosticSink: DiagnosticSink = this@VarianceChecker.trace
+    ): Boolean {
+        if (isIrrelevant(descriptor)) return true
+        var noError = true
+
+        noError = noError and declaration.checkTypeParameters(trace, IN_VARIANCE, diagnosticSink)
+
+        noError = noError and declaration.receiverTypeReference?.checkTypePosition(trace, IN_VARIANCE, diagnosticSink)
+
+        for (parameter in declaration.valueParameters) {
+            noError = noError and parameter.typeReference?.checkTypePosition(trace, IN_VARIANCE, diagnosticSink)
         }
 
+        val returnTypePosition = if (descriptor is VariableDescriptor && descriptor.isVar) INVARIANT else OUT_VARIANCE
+        noError = noError and declaration.createTypeBindingForReturnType(trace)?.checkTypePosition(returnTypePosition, diagnosticSink)
+
+        return noError
+    }
+
+    private fun KtTypeParameterListOwner.checkTypeParameters(
+            trace: BindingContext,
+            typePosition: Variance,
+            diagnosticSink: DiagnosticSink = this@VarianceChecker.trace
+    ): Boolean {
+        var noError = true
+        for (typeParameter in typeParameters) {
+            noError = noError and typeParameter.extendsBound?.checkTypePosition(trace, typePosition, diagnosticSink)
+        }
+        for (typeConstraint in typeConstraints) {
+            noError = noError and typeConstraint.boundTypeReference?.checkTypePosition(trace, typePosition, diagnosticSink)
+        }
+        return noError
+    }
+
+    private fun KtTypeReference.checkTypePosition(trace: BindingContext, position: Variance,
+                                                  diagnosticSink: DiagnosticSink = this@VarianceChecker.trace)
+            = createTypeBinding(trace)?.checkTypePosition(position, diagnosticSink)
+
+    private fun TypeBinding<PsiElement>.checkTypePosition(position: Variance, diagnosticSink: DiagnosticSink = this@VarianceChecker.trace)
+            = checkTypePosition(kotlinType, position, diagnosticSink)
+
+    private fun TypeBinding<PsiElement>.checkTypePosition(containingType: KotlinType, position: Variance,
+                                                          diagnosticSink: DiagnosticSink = this@VarianceChecker.trace): Boolean {
+        val classifierDescriptor = kotlinType.constructor.declarationDescriptor
+        if (classifierDescriptor is TypeParameterDescriptor) {
+            val declarationVariance = classifierDescriptor.varianceWithManual()
+            if (!declarationVariance.allowsPosition(position)
+                && !kotlinType.annotations.hasAnnotation(KotlinBuiltIns.FQ_NAMES.unsafeVariance)) {
+                diagnosticSink.report(
+                        Errors.TYPE_VARIANCE_CONFLICT.on(
+                                psiElement,
+                                VarianceConflictDiagnosticData(containingType, classifierDescriptor, position)
+                        )
+                )
+            }
+            return declarationVariance.allowsPosition(position)
+        }
+
+        var noError = true
+        for (argumentBinding in getArgumentBindings()) {
+            if (argumentBinding == null || argumentBinding.typeParameterDescriptor == null) continue
+
+            val projectionKind = getEffectiveProjectionKind(argumentBinding.typeParameterDescriptor!!, argumentBinding.typeProjection)!!
+            val newPosition = when (projectionKind) {
+                OUT -> position
+                IN -> position.opposite()
+                INV -> INVARIANT
+                STAR -> null // CONFLICTING_PROJECTION error was reported
+            }
+            if (newPosition != null) {
+                noError = noError and argumentBinding.typeBinding.checkTypePosition(containingType, newPosition, diagnosticSink)
+            }
+        }
+        return noError
+    }
+
+    companion object {
         private fun isIrrelevant(descriptor: CallableDescriptor): Boolean {
             val containingClass = descriptor.containingDeclaration
             if (containingClass !is ClassDescriptor) return true
@@ -112,84 +195,6 @@ class VarianceChecker(private val trace: BindingTrace) {
             else {
                 throw IllegalStateException("Unexpected descriptor type: ${descriptor.javaClass.name}")
             }
-        }
-
-        private fun checkCallableDeclaration(
-                trace: BindingContext,
-                declaration: KtCallableDeclaration,
-                descriptor: CallableDescriptor,
-                diagnosticSink: DiagnosticSink
-        ): Boolean {
-            if (isIrrelevant(descriptor)) return true
-            var noError = true
-
-            noError = noError and declaration.checkTypeParameters(trace, IN_VARIANCE, diagnosticSink)
-
-            noError = noError and declaration.receiverTypeReference?.checkTypePosition(trace, IN_VARIANCE, diagnosticSink)
-
-            for (parameter in declaration.valueParameters) {
-                noError = noError and parameter.typeReference?.checkTypePosition(trace, IN_VARIANCE, diagnosticSink)
-            }
-
-            val returnTypePosition = if (descriptor is VariableDescriptor && descriptor.isVar) INVARIANT else OUT_VARIANCE
-            noError = noError and declaration.createTypeBindingForReturnType(trace)?.checkTypePosition(returnTypePosition, diagnosticSink)
-
-            return noError
-        }
-
-        private fun KtTypeParameterListOwner.checkTypeParameters(
-                trace: BindingContext,
-                typePosition: Variance,
-                diagnosticSink: DiagnosticSink
-        ): Boolean {
-            var noError = true
-            for (typeParameter in typeParameters) {
-                noError = noError and typeParameter.extendsBound?.checkTypePosition(trace, typePosition, diagnosticSink)
-            }
-            for (typeConstraint in typeConstraints) {
-                noError = noError and typeConstraint.boundTypeReference?.checkTypePosition(trace, typePosition, diagnosticSink)
-            }
-            return noError
-        }
-
-        private fun KtTypeReference.checkTypePosition(trace: BindingContext, position: Variance, diagnosticSink: DiagnosticSink)
-                = createTypeBinding(trace)?.checkTypePosition(position, diagnosticSink)
-
-        private fun TypeBinding<PsiElement>.checkTypePosition(position: Variance, diagnosticSink: DiagnosticSink)
-                = checkTypePosition(kotlinType, position, diagnosticSink)
-
-        private fun TypeBinding<PsiElement>.checkTypePosition(containingType: KotlinType, position: Variance, diagnosticSink: DiagnosticSink): Boolean {
-            val classifierDescriptor = kotlinType.constructor.declarationDescriptor
-            if (classifierDescriptor is TypeParameterDescriptor) {
-                val declarationVariance = classifierDescriptor.variance
-                if (!declarationVariance.allowsPosition(position)
-                        && !kotlinType.annotations.hasAnnotation(KotlinBuiltIns.FQ_NAMES.unsafeVariance)) {
-                    diagnosticSink.report(
-                            Errors.TYPE_VARIANCE_CONFLICT.on(
-                                    psiElement,
-                                    VarianceConflictDiagnosticData(containingType, classifierDescriptor, position)
-                            )
-                    )
-                }
-                return declarationVariance.allowsPosition(position)
-            }
-
-            var noError = true
-            for (argumentBinding in getArgumentBindings()) {
-                if (argumentBinding == null || argumentBinding.typeParameterDescriptor == null) continue
-
-                val projectionKind = getEffectiveProjectionKind(argumentBinding.typeParameterDescriptor!!, argumentBinding.typeProjection)!!
-                val newPosition = when (projectionKind) {
-                    OUT -> position
-                    IN -> position.opposite()
-                    INV -> INVARIANT
-                    STAR -> null // CONFLICTING_PROJECTION error was reported
-                }
-                if (newPosition != null) {
-                    noError = noError and argumentBinding.typeBinding.checkTypePosition(containingType, newPosition, diagnosticSink)
-                }
-            }
-            return noError
         }
 
         private infix fun Boolean.and(other: Boolean?) = if (other == null) this else this and other
