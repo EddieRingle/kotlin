@@ -35,7 +35,7 @@ import org.jetbrains.kotlin.types.DelegatingType
 import org.jetbrains.kotlin.types.KotlinType
 import java.io.Serializable
 
-class BuiltInClassesAreSerializableOnJvm(
+open class BuiltInClassesAreSerializableOnJvm(
         private val moduleDescriptor: ModuleDescriptor
 ) : AdditionalSupertypes {
 

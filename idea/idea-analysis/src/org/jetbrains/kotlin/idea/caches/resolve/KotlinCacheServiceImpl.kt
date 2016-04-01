@@ -37,7 +37,7 @@ import org.jetbrains.kotlin.idea.project.TargetPlatformDetector
 import org.jetbrains.kotlin.idea.resolve.ResolutionFacade
 import org.jetbrains.kotlin.idea.util.ProjectRootsUtil
 import org.jetbrains.kotlin.js.resolve.JsPlatform
-import org.jetbrains.kotlin.platform.JvmBuiltIns
+import org.jetbrains.kotlin.platform.NewJvmBuiltins
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.TargetPlatform
@@ -242,7 +242,7 @@ private fun globalResolveSessionProvider(
 
     val builtInsFactory: () -> KotlinBuiltIns = when (platform) {
         is JsPlatform -> { -> JsPlatform.builtIns }
-        is JvmPlatform -> { -> JvmBuiltIns.Instance }
+        is JvmPlatform -> { -> NewJvmBuiltins() }
         else -> { -> DefaultBuiltIns.Instance }
     }
 

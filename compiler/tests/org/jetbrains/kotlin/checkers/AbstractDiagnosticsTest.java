@@ -38,7 +38,7 @@ import org.jetbrains.kotlin.descriptors.impl.ModuleDescriptorImpl;
 import org.jetbrains.kotlin.diagnostics.*;
 import org.jetbrains.kotlin.name.FqName;
 import org.jetbrains.kotlin.name.Name;
-import org.jetbrains.kotlin.platform.JvmBuiltIns;
+import org.jetbrains.kotlin.platform.NewJvmBuiltins;
 import org.jetbrains.kotlin.psi.Call;
 import org.jetbrains.kotlin.psi.KtElement;
 import org.jetbrains.kotlin.psi.KtExpression;
@@ -355,7 +355,7 @@ public abstract class AbstractDiagnosticsTest extends BaseDiagnosticsTest {
 
     @NotNull
     protected ModuleDescriptorImpl createModule(@NotNull String moduleName, @NotNull StorageManager storageManager) {
-        return TargetPlatformKt.createModule(JvmPlatform.INSTANCE, Name.special(moduleName), storageManager, JvmBuiltIns.getInstance());
+        return TargetPlatformKt.createModule(JvmPlatform.INSTANCE, Name.special(moduleName), storageManager, new NewJvmBuiltins());
     }
 
     @NotNull

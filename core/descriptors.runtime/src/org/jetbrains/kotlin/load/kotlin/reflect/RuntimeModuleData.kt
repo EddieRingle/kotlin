@@ -33,7 +33,7 @@ import org.jetbrains.kotlin.load.kotlin.DeserializedDescriptorResolver
 import org.jetbrains.kotlin.load.kotlin.JavaClassDataFinder
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.platform.JavaToKotlinClassMap
-import org.jetbrains.kotlin.platform.JvmBuiltIns
+import org.jetbrains.kotlin.platform.NewJvmBuiltins
 import org.jetbrains.kotlin.resolve.jvm.JavaDescriptorResolver
 import org.jetbrains.kotlin.serialization.deserialization.DeserializationComponents
 import org.jetbrains.kotlin.serialization.deserialization.LocalClassResolver
@@ -46,7 +46,7 @@ class RuntimeModuleData private constructor(val deserialization: Deserialization
 
     companion object {
         fun create(classLoader: ClassLoader): RuntimeModuleData {
-            val builtIns = JvmBuiltIns.Instance
+            val builtIns = NewJvmBuiltins()
             val storageManager = LockBasedStorageManager()
             val module = ModuleDescriptorImpl(Name.special("<runtime module for $classLoader>"), storageManager,
                                               ModuleParameters(listOf(), JavaToKotlinClassMap.INSTANCE), builtIns)
@@ -64,6 +64,9 @@ class RuntimeModuleData private constructor(val deserialization: Deserialization
 
             val lazyJavaPackageFragmentProvider =
                     LazyJavaPackageFragmentProvider(globalJavaResolverContext, module, ReflectionTypes(module))
+
+            builtIns.setPackageFragmentProvider(lazyJavaPackageFragmentProvider)
+
             val javaDescriptorResolver = JavaDescriptorResolver(lazyJavaPackageFragmentProvider)
             val javaClassDataFinder = JavaClassDataFinder(reflectKotlinClassFinder, deserializedDescriptorResolver)
             val notFoundClasses = NotFoundClasses(storageManager, module)

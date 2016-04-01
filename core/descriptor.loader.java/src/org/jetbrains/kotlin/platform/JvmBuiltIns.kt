@@ -18,8 +18,12 @@ package org.jetbrains.kotlin.platform
 
 import org.jetbrains.kotlin.builtins.BuiltInsInitializer
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.descriptors.PackageFragmentProvider
 import org.jetbrains.kotlin.load.kotlin.BuiltInClassesAreSerializableOnJvm
 import org.jetbrains.kotlin.serialization.deserialization.AdditionalSupertypes
+import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedClassDescriptor
+import org.jetbrains.kotlin.types.KotlinType
+import javax.inject.Inject
 
 class JvmBuiltIns private constructor() : KotlinBuiltIns() {
     companion object {
@@ -34,5 +38,24 @@ class JvmBuiltIns private constructor() : KotlinBuiltIns() {
 
     override fun getAdditionalSupertypesProvider(): AdditionalSupertypes {
         return BuiltInClassesAreSerializableOnJvm(builtInsModule)
+    }
+}
+
+class NewJvmBuiltins() : KotlinBuiltIns() {
+
+    private lateinit var packageFragmentProvider: PackageFragmentProvider
+
+    @Inject
+    fun setPackageFragmentProvider(packageFragmentProvider: PackageFragmentProvider) {
+        this.packageFragmentProvider = packageFragmentProvider
+    }
+
+    override fun getAdditionalSupertypesProvider(): AdditionalSupertypes {
+        return object : BuiltInClassesAreSerializableOnJvm(builtInsModule) {
+            override fun forClass(classDescriptor: DeserializedClassDescriptor): Collection<KotlinType> {
+                assert(packageFragmentProvider != null)
+                return super.forClass(classDescriptor)
+            }
+        }
     }
 }

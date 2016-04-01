@@ -25,6 +25,9 @@ class InstanceComponentDescriptor(val instance: Any) : ComponentDescriptor {
 
     override fun getDependencies(context: ValueResolveContext): Collection<Class<*>> = emptyList()
 
+    override val shouldInjectProperties: Boolean
+        get() = instance.javaClass.getInfo().setterInfos.isNotEmpty()
+
     override fun toString(): String {
         return "Instance: ${instance.javaClass.simpleName}"
     }

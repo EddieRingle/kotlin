@@ -32,7 +32,7 @@ import org.jetbrains.kotlin.descriptors.*
 import org.jetbrains.kotlin.incremental.components.NoLookupLocation
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.platform.JvmBuiltIns
+import org.jetbrains.kotlin.platform.NewJvmBuiltins
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.CompilerEnvironment
 import org.jetbrains.kotlin.resolve.descriptorUtil.module
@@ -70,7 +70,7 @@ class MultiModuleJavaAnalysisCustomTest : UsefulTestCase() {
                     modules.first { it._name == moduleName }
                 },
                 CompilerEnvironment,
-                builtInsFactory = { JvmBuiltIns.Instance },
+                builtInsFactory = { NewJvmBuiltins() },
                 packagePartProviderFactory = { a, b -> JvmPackagePartProvider(environment) }
         )
 
